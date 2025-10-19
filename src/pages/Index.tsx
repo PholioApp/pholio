@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, User, Image as ImageIcon } from "lucide-react";
+import { Upload, User, Image as ImageIcon, ShoppingBag } from "lucide-react";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -128,6 +128,13 @@ const Index = () => {
             SwipeSnap
           </h1>
           <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => navigate("/purchases")}
+            >
+              <ShoppingBag size={20} />
+            </Button>
             <Button
               variant="secondary"
               size="icon"
