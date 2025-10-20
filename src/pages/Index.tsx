@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, User, Image as ImageIcon, ShoppingBag } from "lucide-react";
+import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search } from "lucide-react";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -71,12 +71,32 @@ const Index = () => {
     setCurrentIndex((prev) => prev + 1);
   };
 
-  const handleSwipeRight = () => {
+  const handleSwipeRight = async () => {
+    const currentImage = images[currentIndex];
+    if (!currentImage || !user) return;
+
+    try {
+      // Insert like into database
+      const { error } = await supabase.from("likes").insert({
+        user_id: user.id,
+        image_id: currentImage.id,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Liked!",
+        description: "Image added to your favorites",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+    
     setCurrentIndex((prev) => prev + 1);
-    toast({
-      title: "Liked!",
-      description: "Image added to your favorites",
-    });
   };
 
   const handleBuy = async () => {
@@ -131,7 +151,24 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
+              onClick={() => navigate("/search")}
+              title="Search"
+            >
+              <Search size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => navigate("/liked")}
+              title="Favorites"
+            >
+              <Heart size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
               onClick={() => navigate("/purchases")}
+              title="Purchases"
             >
               <ShoppingBag size={20} />
             </Button>
@@ -139,6 +176,7 @@ const Index = () => {
               variant="secondary"
               size="icon"
               onClick={() => navigate("/upload")}
+              title="Upload"
             >
               <Upload size={20} />
             </Button>
@@ -146,6 +184,7 @@ const Index = () => {
               variant="secondary"
               size="icon"
               onClick={() => navigate("/profile")}
+              title="Profile"
             >
               <User size={20} />
             </Button>
