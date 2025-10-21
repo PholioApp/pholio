@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search as SearchIcon, User, Image as ImageIcon, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Search as SearchIcon, User, Image as ImageIcon, ShoppingCart, Filter, X } from "lucide-react";
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,6 +16,9 @@ const Search = () => {
   const [sellers, setSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [priceRange, setPriceRange] = useState<string>("all");
+  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -24,41 +29,82 @@ const Search = () => {
         navigate("/auth");
       } else {
         setUser(user);
+        loadAvailableTags();
       }
     };
     checkAuth();
   }, [navigate]);
 
+  const loadAvailableTags = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("images")
+        .select("tags")
+        .eq("status", "active");
+
+      if (error) throw error;
+
+      const allTags = new Set<string>();
+      data?.forEach(img => {
+        img.tags?.forEach((tag: string) => allTags.add(tag));
+      });
+      setAvailableTags(Array.from(allTags));
+    } catch (error) {
+      console.error("Error loading tags:", error);
+    }
+  };
+
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    
     setLoading(true);
     try {
-      // Search images
-      const { data: imageData, error: imageError } = await supabase
+      let query = supabase
         .from("images")
         .select(`
           *,
           seller:profiles!images_seller_id_fkey(username, avatar_url)
         `)
-        .eq("status", "active")
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,tags.cs.{${searchQuery}}`)
+        .eq("status", "active");
+
+      // Apply text search
+      if (searchQuery.trim()) {
+        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+      }
+
+      // Apply tag filter
+      if (selectedTag) {
+        query = query.contains("tags", [selectedTag]);
+      }
+
+      // Apply price range filter
+      if (priceRange !== "all") {
+        const [min, max] = priceRange.split("-").map(Number);
+        query = query.gte("price", min);
+        if (max) {
+          query = query.lte("price", max);
+        }
+      }
+
+      const { data: imageData, error: imageError } = await query
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (imageError) throw imageError;
 
-      // Search sellers
-      const { data: sellerData, error: sellerError } = await supabase
-        .from("profiles")
-        .select("*")
-        .ilike("username", `%${searchQuery}%`)
-        .limit(20);
+      // Search sellers only if there's a text query
+      let sellerData = [];
+      if (searchQuery.trim()) {
+        const { data, error: sellerError } = await supabase
+          .from("profiles")
+          .select("*")
+          .ilike("username", `%${searchQuery}%`)
+          .limit(20);
 
-      if (sellerError) throw sellerError;
+        if (sellerError) throw sellerError;
+        sellerData = data || [];
+      }
 
       setImages(imageData || []);
-      setSellers(sellerData || []);
+      setSellers(sellerData);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -70,23 +116,23 @@ const Search = () => {
     }
   };
 
-  const handleBuy = async (imageId: string, price: number) => {
+  const handleBuy = async (imageId: string) => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.from("purchases").insert({
-        buyer_id: user.id,
-        image_id: imageId,
-        amount: price,
-        status: "completed",
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { imageId },
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Purchase successful!",
-        description: "The image has been added to your collection.",
-      });
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast({
+          title: "Redirecting to checkout",
+          description: "Complete your purchase in the new tab.",
+        });
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -96,30 +142,94 @@ const Search = () => {
     }
   };
 
+  const clearFilters = () => {
+    setSearchQuery("");
+    setPriceRange("all");
+    setSelectedTag("");
+    setImages([]);
+    setSellers([]);
+  };
+
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto py-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="secondary" onClick={() => navigate("/")}>
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="secondary" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft size={18} />
           </Button>
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Search
+          </h1>
+        </div>
+
+        <div className="space-y-4 mb-8">
           <div className="flex-1 relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
             <Input
               type="text"
-              placeholder="Search images or sellers..."
+              placeholder="Search by title or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="pl-10 pr-24"
+              className="pl-10"
             />
+          </div>
+
+          <Card className="p-4 bg-gradient-card border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <Filter size={16} className="text-muted-foreground" />
+              <h3 className="font-semibold text-sm">Filters</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">Price Range</label>
+                <Select value={priceRange} onValueChange={setPriceRange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Prices</SelectItem>
+                    <SelectItem value="0-10">$0 - $10</SelectItem>
+                    <SelectItem value="10-25">$10 - $25</SelectItem>
+                    <SelectItem value="25-50">$25 - $50</SelectItem>
+                    <SelectItem value="50-100">$50 - $100</SelectItem>
+                    <SelectItem value="100-999999">$100+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">Tag</label>
+                <Select value={selectedTag} onValueChange={setSelectedTag}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a tag..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Tags</SelectItem>
+                    {availableTags.map((tag) => (
+                      <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </Card>
+
+          <div className="flex gap-2">
             <Button 
               onClick={handleSearch} 
-              disabled={loading || !searchQuery.trim()}
-              className="absolute right-1 top-1/2 -translate-y-1/2 bg-gradient-primary"
+              disabled={loading}
+              className="flex-1 bg-gradient-primary"
             >
-              Search
+              <SearchIcon className="mr-2" size={16} />
+              {loading ? "Searching..." : "Search"}
             </Button>
+            {(searchQuery || priceRange !== "all" || selectedTag) && (
+              <Button variant="secondary" onClick={clearFilters}>
+                <X size={16} className="mr-2" />
+                Clear
+              </Button>
+            )}
           </div>
         </div>
 
@@ -163,8 +273,17 @@ const Search = () => {
                             by @{img.seller?.username || "unknown"}
                           </p>
                         </div>
+                        {img.tags && img.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {img.tags.slice(0, 3).map((tag: string, idx: number) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                         <Button
-                          onClick={() => handleBuy(img.id, img.price)}
+                          onClick={() => handleBuy(img.id)}
                           className="w-full bg-gradient-primary"
                         >
                           <ShoppingCart className="mr-2" size={16} />
