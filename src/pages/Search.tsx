@@ -17,7 +17,7 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [priceRange, setPriceRange] = useState<string>("all");
-  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [selectedTag, setSelectedTag] = useState<string>("all");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -71,7 +71,7 @@ const Search = () => {
       }
 
       // Apply tag filter
-      if (selectedTag) {
+      if (selectedTag && selectedTag !== "all") {
         query = query.contains("tags", [selectedTag]);
       }
 
@@ -145,7 +145,7 @@ const Search = () => {
   const clearFilters = () => {
     setSearchQuery("");
     setPriceRange("all");
-    setSelectedTag("");
+    setSelectedTag("all");
     setImages([]);
     setSellers([]);
   };
@@ -205,7 +205,7 @@ const Search = () => {
                     <SelectValue placeholder="Select a tag..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Tags</SelectItem>
+                    <SelectItem value="all">All Tags</SelectItem>
                     {availableTags.map((tag) => (
                       <SelectItem key={tag} value={tag}>{tag}</SelectItem>
                     ))}
@@ -224,7 +224,7 @@ const Search = () => {
               <SearchIcon className="mr-2" size={16} />
               {loading ? "Searching..." : "Search"}
             </Button>
-            {(searchQuery || priceRange !== "all" || selectedTag) && (
+            {(searchQuery || priceRange !== "all" || selectedTag !== "all") && (
               <Button variant="secondary" onClick={clearFilters}>
                 <X size={16} className="mr-2" />
                 Clear
