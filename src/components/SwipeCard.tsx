@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, X, ShoppingCart, User } from "lucide-react";
+import { Heart, X, ShoppingCart, User, Share2 } from "lucide-react";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SwipeCardProps {
   image: {
@@ -23,9 +25,23 @@ interface SwipeCardProps {
 
 export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCardProps) => {
   const [exitX, setExitX] = useState(0);
+  const [likeCount, setLikeCount] = useState(0);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchLikeCount();
+  }, [image.id]);
+
+  const fetchLikeCount = async () => {
+    const { count } = await supabase
+      .from("likes")
+      .select("*", { count: "exact", head: true })
+      .eq("image_id", image.id);
+    setLikeCount(count || 0);
+  };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (Math.abs(info.offset.x) > 100) {
@@ -34,6 +50,39 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
         onSwipeRight();
       } else {
         onSwipeLeft();
+      }
+    }
+  };
+
+  const handleShareImage = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareData = {
+      title: image.title,
+      text: `Check out "${image.title}" by @${image.seller.username} on SwipeSnap!`,
+      url: window.location.origin,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Thanks for sharing!",
+          description: "Help creators get discovered 🚀",
+        });
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        toast({
+          title: "Link copied!",
+          description: "Share this amazing photo with others!",
+        });
+      }
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to share",
+        });
       }
     }
   };
@@ -65,20 +114,40 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
           />
           
           {/* Seller info overlay */}
-          <div className="absolute top-4 left-4 right-4 flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg p-2">
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden">
-              {image.seller.avatar_url ? (
-                <img src={image.seller.avatar_url} alt={image.seller.username} className="w-full h-full object-cover" />
-              ) : (
-                <User size={16} className="text-muted-foreground" />
-              )}
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg p-2">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden">
+                {image.seller.avatar_url ? (
+                  <img src={image.seller.avatar_url} alt={image.seller.username} className="w-full h-full object-cover" />
+                ) : (
+                  <User size={16} className="text-muted-foreground" />
+                )}
+              </div>
+              <span className="text-sm font-medium">@{image.seller.username}</span>
             </div>
-            <span className="text-sm font-medium">@{image.seller.username}</span>
+            
+            {/* Share button */}
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-10 w-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
+              onClick={handleShareImage}
+            >
+              <Share2 size={16} />
+            </Button>
           </div>
 
-          {/* Price tag */}
-          <div className="absolute top-4 right-4 bg-gradient-primary rounded-lg px-3 py-1.5 shadow-glow">
-            <span className="text-sm font-bold">${image.price}</span>
+          {/* Price and likes */}
+          <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+            <div className="bg-gradient-primary rounded-lg px-3 py-1.5 shadow-glow">
+              <span className="text-sm font-bold">${image.price}</span>
+            </div>
+            {likeCount > 0 && (
+              <div className="bg-background/80 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-1">
+                <Heart size={14} className="text-accent fill-accent" />
+                <span className="text-xs font-medium">{likeCount}</span>
+              </div>
+            )}
           </div>
         </div>
 

@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search } from "lucide-react";
+import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, TrendingUp, Users } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
   const [images, setImages] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ totalImages: 0, totalUsers: 0, totalLikes: 0 });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -56,6 +58,9 @@ const Index = () => {
 
       if (error) throw error;
       setImages(data || []);
+      
+      // Fetch platform stats
+      await fetchStats();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -64,6 +69,56 @@ const Index = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const [imagesCount, usersCount, likesCount] = await Promise.all([
+        supabase.from("images").select("*", { count: "exact", head: true }),
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("likes").select("*", { count: "exact", head: true }),
+      ]);
+      
+      setStats({
+        totalImages: imagesCount.count || 0,
+        totalUsers: usersCount.count || 0,
+        totalLikes: likesCount.count || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "SwipeSnap - Discover & Buy Amazing Photos",
+      text: "Check out SwipeSnap! Discover and purchase stunning photography with a simple swipe.",
+      url: window.location.origin,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Thanks for sharing!",
+          description: "Help us grow by inviting friends 🎉",
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.origin);
+        toast({
+          title: "Link copied!",
+          description: "Share it with your friends to help us grow!",
+        });
+      }
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to share",
+        });
+      }
     }
   };
 
@@ -141,11 +196,20 @@ const Index = () => {
     <div className="min-h-screen p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 pt-4">
+        <div className="flex items-center justify-between mb-6 pt-4">
           <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             SwipeSnap
           </h1>
           <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={handleShare}
+              title="Share App"
+              className="bg-gradient-primary hover:opacity-90"
+            >
+              <Share2 size={20} />
+            </Button>
             <Button
               variant="secondary"
               size="icon"
@@ -187,6 +251,31 @@ const Index = () => {
               <User size={20} />
             </Button>
           </div>
+        </div>
+
+        {/* Platform Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <Card className="p-3 bg-gradient-card border-border">
+            <div className="flex items-center gap-2 mb-1">
+              <ImageIcon size={16} className="text-primary" />
+              <span className="text-xs text-muted-foreground">Images</span>
+            </div>
+            <p className="text-xl font-bold">{stats.totalImages}</p>
+          </Card>
+          <Card className="p-3 bg-gradient-card border-border">
+            <div className="flex items-center gap-2 mb-1">
+              <Users size={16} className="text-primary" />
+              <span className="text-xs text-muted-foreground">Creators</span>
+            </div>
+            <p className="text-xl font-bold">{stats.totalUsers}</p>
+          </Card>
+          <Card className="p-3 bg-gradient-card border-border">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp size={16} className="text-primary" />
+              <span className="text-xs text-muted-foreground">Likes</span>
+            </div>
+            <p className="text-xl font-bold">{stats.totalLikes}</p>
+          </Card>
         </div>
 
         {/* Swipe Area */}
