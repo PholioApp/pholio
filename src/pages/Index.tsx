@@ -104,21 +104,19 @@ const Index = () => {
     if (!currentImage || !user) return;
 
     try {
-      const { error } = await supabase.from("purchases").insert({
-        buyer_id: user.id,
-        image_id: currentImage.id,
-        amount: currentImage.price,
-        status: "completed",
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { imageId: currentImage.id },
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Purchase successful!",
-        description: "The image has been added to your collection.",
-      });
-
-      setCurrentIndex((prev) => prev + 1);
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast({
+          title: "Redirecting to checkout",
+          description: "Complete your purchase in the new tab.",
+        });
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
