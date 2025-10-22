@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile";
 import Purchases from "./pages/Purchases";
 import Liked from "./pages/Liked";
 import Search from "./pages/Search";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId" element={<PublicProfile />} />
           <Route path="/purchases" element={<Purchases />} />
           <Route path="/liked" element={<Liked />} />
           <Route path="/search" element={<Search />} />

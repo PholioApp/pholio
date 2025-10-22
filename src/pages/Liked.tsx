@@ -169,9 +169,15 @@ const Liked = () => {
                   <div className="p-4 space-y-3">
                     <div>
                       <h3 className="font-bold text-lg mb-1">{img.title}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/profile/${img.seller_id}`);
+                        }}
+                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      >
                         by @{img.seller?.username || "unknown"}
-                      </p>
+                      </button>
                     </div>
                     <div className="flex gap-2">
                       <Button

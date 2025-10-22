@@ -269,9 +269,12 @@ const Search = () => {
                       <div className="p-4 space-y-3">
                         <div>
                           <h3 className="font-bold text-lg mb-1">{img.title}</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <button
+                            onClick={() => navigate(`/profile/${img.seller_id}`)}
+                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                          >
                             by @{img.seller?.username || "unknown"}
-                          </p>
+                          </button>
                         </div>
                         {img.tags && img.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
@@ -305,7 +308,11 @@ const Search = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sellers.map((seller) => (
-                    <Card key={seller.id} className="p-6 bg-gradient-card border-border shadow-card hover-scale">
+                    <Card 
+                      key={seller.id} 
+                      className="p-6 bg-gradient-card border-border shadow-card hover-scale cursor-pointer"
+                      onClick={() => navigate(`/profile/${seller.id}`)}
+                    >
                       <div className="flex items-center gap-4 mb-4">
                         <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center text-xl font-bold shadow-glow">
                           {seller.username?.[0]?.toUpperCase() || "?"}

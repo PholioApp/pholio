@@ -13,6 +13,7 @@ interface SwipeCardProps {
     description: string;
     price: number;
     image_url: string;
+    seller_id: string;
     seller: {
       username: string;
       avatar_url?: string;
@@ -115,7 +116,13 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
           
           {/* Seller info overlay */}
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg p-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = `/profile/${image.seller_id}`;
+              }}
+              className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg p-2 hover:bg-background/90 transition-colors"
+            >
               <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden">
                 {image.seller.avatar_url ? (
                   <img src={image.seller.avatar_url} alt={image.seller.username} className="w-full h-full object-cover" />
@@ -124,7 +131,7 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
                 )}
               </div>
               <span className="text-sm font-medium">@{image.seller.username}</span>
-            </div>
+            </button>
             
             {/* Share button */}
             <Button
