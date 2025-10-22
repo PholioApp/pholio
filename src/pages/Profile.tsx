@@ -13,6 +13,7 @@ const Profile = () => {
   const [myImages, setMyImages] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,6 +36,16 @@ const Profile = () => {
         .single();
 
       setProfile(profileData);
+
+      // Check if user is admin
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      setIsAdmin(!!roleData);
 
       // Fetch user's images
       const { data: imagesData } = await supabase
@@ -142,10 +153,17 @@ const Profile = () => {
             <ArrowLeft className="mr-2" size={18} />
             Back
           </Button>
-          <Button variant="destructive" onClick={handleSignOut}>
-            <LogOut className="mr-2" size={18} />
-            Sign Out
-          </Button>
+          <div className="flex gap-2">
+            {isAdmin && (
+              <Button variant="outline" onClick={() => navigate("/admin")}>
+                Admin Panel
+              </Button>
+            )}
+            <Button variant="destructive" onClick={handleSignOut}>
+              <LogOut className="mr-2" size={18} />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         <Card className="p-6 bg-gradient-card shadow-card border-border mb-8">
