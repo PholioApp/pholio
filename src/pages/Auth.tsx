@@ -11,6 +11,7 @@ import { Eye, EyeOff, Image } from "lucide-react";
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -19,12 +20,34 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if this is a password reset link
+  useState(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    if (type === 'recovery') {
+      setIsPasswordReset(true);
+    }
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      if (isForgotPassword) {
+      if (isPasswordReset) {
+        const { error } = await supabase.auth.updateUser({
+          password: password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Password updated!",
+          description: "Your password has been successfully reset.",
+        });
+        setIsPasswordReset(false);
+        navigate("/");
+      } else if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth`,
         });
@@ -91,13 +114,13 @@ const Auth = () => {
             SwipeSnap
           </h1>
           <p className="text-muted-foreground">
-            {isForgotPassword ? "Reset your password" : "Discover and sell amazing photography"}
+            {isPasswordReset ? "Enter your new password" : isForgotPassword ? "Reset your password" : "Discover and sell amazing photography"}
           </p>
         </div>
 
         <Card className="p-6 bg-gradient-card shadow-card border-border">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && !isForgotPassword && (
+            {!isLogin && !isForgotPassword && !isPasswordReset && (
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>
                 <Input
@@ -112,18 +135,20 @@ const Auth = () => {
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-secondary border-border"
-              />
-            </div>
+            {!isPasswordReset && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-secondary border-border"
+                />
+              </div>
+            )}
 
             {!isForgotPassword && (
               <div className="space-y-2">
@@ -154,11 +179,12 @@ const Auth = () => {
               className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
               disabled={loading}
             >
-              {loading ? "Loading..." : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
+              {loading ? "Loading..." : isPasswordReset ? "Reset Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
 
-            <div className="text-center text-sm space-y-2">
-              {!isForgotPassword && isLogin && (
+            {!isPasswordReset && (
+              <div className="text-center text-sm space-y-2">
+                {!isForgotPassword && isLogin && (
                 <button
                   type="button"
                   onClick={() => setIsForgotPassword(true)}
@@ -181,7 +207,8 @@ const Auth = () => {
                   ? "Don't have an account? Sign up"
                   : "Already have an account? Sign in"}
               </button>
-            </div>
+              </div>
+            )}
           </form>
         </Card>
       </div>
