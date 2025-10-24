@@ -45,6 +45,7 @@ const Auth = () => {
   const [emailValid, setEmailValid] = useState(false);
   const [focusedField, setFocusedField] = useState("");
   const [formProgress, setFormProgress] = useState(0);
+  const [stats, setStats] = useState({ totalUsers: 0, totalImages: 0, usersToday: 0 });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -91,6 +92,41 @@ const Auth = () => {
     if (passwordStrength < 70) return "Medium";
     return "Strong";
   };
+
+  // Fetch real stats from database
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Get total users
+        const { count: totalUsers } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+
+        // Get total images
+        const { count: totalImages } = await supabase
+          .from('images')
+          .select('*', { count: 'exact', head: true });
+
+        // Get users who joined today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const { count: usersToday } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', today.toISOString());
+
+        setStats({
+          totalUsers: totalUsers || 0,
+          totalImages: totalImages || 0,
+          usersToday: usersToday || 0,
+        });
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   // Check if this is a password reset link
   useEffect(() => {
@@ -214,11 +250,11 @@ const Auth = () => {
             </Badge>
             <Badge variant="secondary" className="gap-1">
               <Users className="w-3 h-3" />
-              10K+ Users
+              {stats.totalUsers.toLocaleString()}+ Users
             </Badge>
             <Badge variant="secondary" className="gap-1">
-              <Star className="w-3 h-3" />
-              4.9 Rating
+              <Camera className="w-3 h-3" />
+              {stats.totalImages.toLocaleString()}+ Photos
             </Badge>
             <Badge variant="secondary" className="gap-1">
               <TrendingUp className="w-3 h-3" />
@@ -549,15 +585,11 @@ const Auth = () => {
               <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  <span>10,000+ Users</span>
+                  <span>{stats.totalUsers.toLocaleString()} Users</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Camera className="w-3 h-3" />
-                  <span>50,000+ Photos</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 text-yellow-500" />
-                  <span>4.9/5.0</span>
+                  <span>{stats.totalImages.toLocaleString()} Photos</span>
                 </div>
               </div>
             </div>
@@ -611,20 +643,22 @@ const Auth = () => {
 
         {/* Bottom social proof */}
         <div className="mt-6 text-center animate-fade-in">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-gradient-primary border-2 border-background flex items-center justify-center text-xs font-bold">
-                  {String.fromCharCode(64 + i)}
-                </div>
-              ))}
+          {stats.usersToday > 0 && (
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-primary border-2 border-background flex items-center justify-center text-xs font-bold">
+                    {String.fromCharCode(64 + i)}
+                  </div>
+                ))}
+              </div>
+              <Badge className="bg-accent border-0 gap-1">
+                <TrendingUp className="w-3 h-3" />
+                +{stats.usersToday} joined today
+              </Badge>
             </div>
-            <Badge className="bg-accent border-0 gap-1">
-              <TrendingUp className="w-3 h-3" />
-              +127 joined today
-            </Badge>
-          </div>
-          <p className="text-xs text-muted-foreground">Join thousands of photographers selling worldwide 🌍</p>
+          )}
+          <p className="text-xs text-muted-foreground">Join photographers selling worldwide 🌍</p>
         </div>
       </div>
     </div>
