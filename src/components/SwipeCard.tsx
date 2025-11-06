@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, X, ShoppingCart, User, Share2 } from "lucide-react";
+import { Heart, X, ShoppingCart, User, Share2, Flag } from "lucide-react";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ReportDialog } from "@/components/ReportDialog";
 
 interface SwipeCardProps {
   image: {
@@ -27,6 +28,7 @@ interface SwipeCardProps {
 export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCardProps) => {
   const [exitX, setExitX] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
@@ -133,15 +135,28 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
               <span className="text-sm font-medium">@{image.seller.username}</span>
             </button>
             
-            {/* Share button */}
-            <Button
-              size="icon"
-              variant="secondary"
-              className="h-10 w-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
-              onClick={handleShareImage}
-            >
-              <Share2 size={16} />
-            </Button>
+            {/* Share and Report buttons */}
+            <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant="secondary"
+                className="h-10 w-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
+                onClick={handleShareImage}
+              >
+                <Share2 size={16} />
+              </Button>
+              <Button
+                size="icon"
+                variant="secondary"
+                className="h-10 w-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setReportDialogOpen(true);
+                }}
+              >
+                <Flag size={16} />
+              </Button>
+            </div>
           </div>
 
           {/* Price and likes */}
@@ -196,6 +211,14 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
           </div>
         </div>
       </Card>
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={setReportDialogOpen}
+        contentType="image"
+        contentId={image.id}
+        contentPreview={`"${image.title}" by @${image.seller.username}`}
+      />
     </motion.div>
   );
 };

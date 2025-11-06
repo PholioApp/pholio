@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ArrowLeft, Ban, CheckCircle, User, Mail, Calendar, Clock } from "lucide-react";
+import { Shield, ArrowLeft, Ban, CheckCircle, User, Mail, Calendar, Clock, AlertTriangle, Eye, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -46,8 +48,32 @@ interface Profile {
   banned_by: string | null;
 }
 
+interface Report {
+  id: string;
+  reporter_id: string;
+  reported_content_type: string;
+  reported_content_id: string;
+  reason: string;
+  description: string | null;
+  status: string;
+  created_at: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  action_taken: string | null;
+  reporter?: {
+    username: string;
+    email: string;
+  };
+  image?: {
+    image_url: string;
+    title: string;
+    seller_id: string;
+  };
+}
+
 const Admin = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [banDialogOpen, setBanDialogOpen] = useState(false);
@@ -55,12 +81,16 @@ const Admin = () => {
   const [banDuration, setBanDuration] = useState<string>("7");
   const [customDays, setCustomDays] = useState<string>("");
   const [banReason, setBanReason] = useState<string>("");
+  const [activeTab, setActiveTab] = useState("users");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     checkAdminAndFetchProfiles();
-  }, []);
+    if (isAdmin) {
+      fetchReports();
+    }
+  }, [isAdmin]);
 
   const checkAdminAndFetchProfiles = async () => {
     try {
@@ -108,6 +138,25 @@ const Admin = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReports = async () => {
+    try {
+      const { data: reportsData, error: reportsError } = await supabase
+        .from("reports")
+        .select(`
+          *,
+          reporter:profiles!reports_reporter_id_fkey(username, email),
+          image:images!reports_reported_content_id_fkey(image_url, title, seller_id)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (reportsError) throw reportsError;
+
+      setReports((reportsData || []) as unknown as Report[]);
+    } catch (error: any) {
+      console.error("Error fetching reports:", error);
     }
   };
 
@@ -165,6 +214,65 @@ const Admin = () => {
 
       setBanDialogOpen(false);
       checkAdminAndFetchProfiles();
+      fetchReports();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleReportAction = async (reportId: string, action: "dismiss" | "remove_content" | "ban_user", report: Report) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Update report status
+      const { error: updateError } = await supabase
+        .from("reports")
+        .update({
+          status: action === "dismiss" ? "dismissed" : "action_taken",
+          reviewed_by: user.id,
+          reviewed_at: new Date().toISOString(),
+          action_taken: action,
+        })
+        .eq("id", reportId);
+
+      if (updateError) throw updateError;
+
+      // Take action based on type
+      if (action === "remove_content" && report.reported_content_type === "image") {
+        const { error: deleteError } = await supabase
+          .from("images")
+          .delete()
+          .eq("id", report.reported_content_id);
+
+        if (deleteError) throw deleteError;
+      } else if (action === "ban_user" && report.image?.seller_id) {
+        const { error: banError } = await supabase
+          .from("profiles")
+          .update({
+            banned: true,
+            banned_at: new Date().toISOString(),
+            ban_reason: `Content violation: ${report.reason}`,
+            banned_by: user.id,
+          })
+          .eq("id", report.image.seller_id);
+
+        if (banError) throw banError;
+      }
+
+      toast({
+        title: "Action Completed",
+        description: `Report has been ${action === "dismiss" ? "dismissed" : "actioned"}.`,
+      });
+
+      fetchReports();
+      if (action === "ban_user") {
+        checkAdminAndFetchProfiles();
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -234,13 +342,31 @@ const Admin = () => {
           </div>
         </div>
 
-        <Card className="p-6 bg-gradient-card shadow-card border-border">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">User Management</h2>
-            <p className="text-muted-foreground text-sm">
-              Total Users: {profiles.length}
-            </p>
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="users">
+              <User className="w-4 h-4 mr-2" />
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="reports">
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              Reports
+              {reports.filter(r => r.status === "pending").length > 0 && (
+                <Badge variant="destructive" className="ml-2">
+                  {reports.filter(r => r.status === "pending").length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="users">
+            <Card className="p-6 bg-gradient-card shadow-card border-border">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold mb-2">User Management</h2>
+                <p className="text-muted-foreground text-sm">
+                  Total Users: {profiles.length}
+                </p>
+              </div>
 
           <div className="overflow-x-auto">
             <Table>
@@ -337,8 +463,103 @@ const Admin = () => {
                 ))}
               </TableBody>
             </Table>
-          </div>
-        </Card>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <Card className="p-6 bg-gradient-card shadow-card border-border">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold mb-2">Content Reports</h2>
+                <p className="text-muted-foreground text-sm">
+                  Total Reports: {reports.length} | Pending: {reports.filter(r => r.status === "pending").length}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {reports.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No reports found.</p>
+                ) : (
+                  reports.map((report) => (
+                    <Card key={report.id} className="p-4 border-border">
+                      <div className="flex gap-4">
+                        {report.image && (
+                          <img 
+                            src={report.image.image_url} 
+                            alt={report.image.title}
+                            className="w-24 h-24 object-cover rounded-md"
+                          />
+                        )}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant={report.status === "pending" ? "destructive" : "secondary"}>
+                                  {report.status}
+                                </Badge>
+                                <Badge variant="outline">{report.reason}</Badge>
+                              </div>
+                              <p className="text-sm font-medium">
+                                Type: {report.reported_content_type}
+                              </p>
+                              {report.description && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {report.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>Reported by: {report.reporter?.username || "Unknown"}</span>
+                            <span>{new Date(report.created_at).toLocaleDateString()}</span>
+                          </div>
+
+                          {report.status === "pending" && (
+                            <div className="flex gap-2 pt-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleReportAction(report.id, "dismiss", report)}
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                Dismiss
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive"
+                                onClick={() => handleReportAction(report.id, "remove_content", report)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Remove Content
+                              </Button>
+                              {report.image?.seller_id && (
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  onClick={() => handleReportAction(report.id, "ban_user", report)}
+                                >
+                                  <Ban className="w-4 h-4 mr-1" />
+                                  Ban User
+                                </Button>
+                              )}
+                            </div>
+                          )}
+
+                          {report.status !== "pending" && report.action_taken && (
+                            <p className="text-xs text-muted-foreground pt-2">
+                              Action taken: {report.action_taken}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Ban Dialog */}

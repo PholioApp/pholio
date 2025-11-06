@@ -102,7 +102,11 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          ban_reason: string | null
           banned: boolean | null
+          banned_at: string | null
+          banned_by: string | null
+          banned_until: string | null
           bio: string | null
           created_at: string
           email: string
@@ -112,7 +116,11 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          ban_reason?: string | null
           banned?: boolean | null
+          banned_at?: string | null
+          banned_by?: string | null
+          banned_until?: string | null
           bio?: string | null
           created_at?: string
           email: string
@@ -122,7 +130,11 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          ban_reason?: string | null
           banned?: boolean | null
+          banned_at?: string | null
+          banned_by?: string | null
+          banned_until?: string | null
           bio?: string | null
           created_at?: string
           email?: string
@@ -173,6 +185,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reports: {
+        Row: {
+          action_taken: string | null
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reported_content_id: string
+          reported_content_type: string
+          reporter_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reported_content_id: string
+          reported_content_type: string
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reported_content_id?: string
+          reported_content_type?: string
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
