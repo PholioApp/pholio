@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, ArrowLeft, Ban, CheckCircle, User, Mail, Calendar } from "lucide-react";
+import { Shield, ArrowLeft, Ban, CheckCircle, User, Mail, Calendar, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
@@ -14,6 +14,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 interface Profile {
   id: string;
@@ -22,12 +40,21 @@ interface Profile {
   avatar_url: string;
   created_at: string;
   banned: boolean;
+  ban_reason: string | null;
+  banned_until: string | null;
+  banned_at: string | null;
+  banned_by: string | null;
 }
 
 const Admin = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [banDuration, setBanDuration] = useState<string>("7");
+  const [customDays, setCustomDays] = useState<string>("");
+  const [banReason, setBanReason] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -72,7 +99,7 @@ const Admin = () => {
 
       if (profilesError) throw profilesError;
 
-      setProfiles(profilesData || []);
+      setProfiles((profilesData || []) as unknown as Profile[]);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -84,23 +111,89 @@ const Admin = () => {
     }
   };
 
-  const toggleBanUser = async (userId: string, currentBanStatus: boolean) => {
+  const openBanDialog = (profile: Profile) => {
+    setSelectedUser(profile);
+    setBanDialogOpen(true);
+    setBanDuration("7");
+    setCustomDays("");
+    setBanReason("");
+  };
+
+  const handleBanUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      let bannedUntil: string | null = null;
+      
+      if (banDuration === "permanent") {
+        bannedUntil = null;
+      } else {
+        const days = banDuration === "custom" ? parseInt(customDays) : parseInt(banDuration);
+        if (isNaN(days) || days <= 0) {
+          toast({
+            variant: "destructive",
+            title: "Invalid Duration",
+            description: "Please enter a valid number of days.",
+          });
+          return;
+        }
+        const until = new Date();
+        until.setDate(until.getDate() + days);
+        bannedUntil = until.toISOString();
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          banned: true,
+          banned_at: new Date().toISOString(),
+          banned_until: bannedUntil,
+          ban_reason: banReason || null,
+          banned_by: user.id,
+        })
+        .eq("id", selectedUser.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "User Banned",
+        description: `User has been banned ${banDuration === "permanent" ? "permanently" : `for ${banDuration === "custom" ? customDays : banDuration} days`}.`,
+      });
+
+      setBanDialogOpen(false);
+      checkAdminAndFetchProfiles();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleUnbanUser = async (userId: string) => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ banned: !currentBanStatus })
+        .update({
+          banned: false,
+          banned_at: null,
+          banned_until: null,
+          ban_reason: null,
+          banned_by: null,
+        })
         .eq("id", userId);
 
       if (error) throw error;
 
       toast({
-        title: currentBanStatus ? "User Unbanned" : "User Banned",
-        description: currentBanStatus
-          ? "User can now access the platform."
-          : "User has been banned from the platform.",
+        title: "User Unbanned",
+        description: "User can now access the platform.",
       });
 
-      // Refresh profiles
       checkAdminAndFetchProfiles();
     } catch (error: any) {
       toast({
@@ -209,13 +302,36 @@ const Admin = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant={profile.banned ? "outline" : "destructive"}
-                        size="sm"
-                        onClick={() => toggleBanUser(profile.id, profile.banned)}
-                      >
-                        {profile.banned ? "Unban" : "Ban"}
-                      </Button>
+                      {profile.banned ? (
+                        <div className="space-y-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUnbanUser(profile.id)}
+                          >
+                            Unban
+                          </Button>
+                          {profile.ban_reason && (
+                            <p className="text-xs text-muted-foreground">
+                              Reason: {profile.ban_reason}
+                            </p>
+                          )}
+                          {profile.banned_until && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              Until: {new Date(profile.banned_until).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => openBanDialog(profile)}
+                        >
+                          Ban
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -224,6 +340,71 @@ const Admin = () => {
           </div>
         </Card>
       </div>
+
+      {/* Ban Dialog */}
+      <Dialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ban User</DialogTitle>
+            <DialogDescription>
+              Ban {selectedUser?.username} from the platform. Choose a duration and provide a reason.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="duration">Ban Duration</Label>
+              <Select value={banDuration} onValueChange={setBanDuration}>
+                <SelectTrigger id="duration">
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 Day</SelectItem>
+                  <SelectItem value="7">7 Days</SelectItem>
+                  <SelectItem value="30">30 Days</SelectItem>
+                  <SelectItem value="90">90 Days</SelectItem>
+                  <SelectItem value="custom">Custom</SelectItem>
+                  <SelectItem value="permanent">Permanent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {banDuration === "custom" && (
+              <div className="space-y-2">
+                <Label htmlFor="customDays">Number of Days</Label>
+                <Input
+                  id="customDays"
+                  type="number"
+                  min="1"
+                  placeholder="Enter number of days"
+                  value={customDays}
+                  onChange={(e) => setCustomDays(e.target.value)}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="reason">Reason (Optional)</Label>
+              <Textarea
+                id="reason"
+                placeholder="Enter reason for ban..."
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBanDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleBanUser}>
+              Ban User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
