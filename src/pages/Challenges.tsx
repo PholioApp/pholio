@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Trophy, Calendar, ThumbsUp, Upload, Award } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const Challenges = () => {
   const [user, setUser] = useState<any>(null);
@@ -214,14 +215,7 @@ const Challenges = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Trophy className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
-          <p className="text-muted-foreground">Loading challenges...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading challenges..." />;
   }
 
   return (

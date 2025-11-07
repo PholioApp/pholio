@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, DollarSign, Image as ImageIcon, TrendingUp, Eye } from "lucide-react";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const SellerDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -85,14 +86,7 @@ const SellerDashboard = () => {
   }, [navigate, toast]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <DollarSign className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
-          <p className="text-muted-foreground">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading your dashboard..." />;
   }
 
   return (

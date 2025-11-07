@@ -6,6 +6,7 @@ import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, TrendingUp, Users, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -182,14 +183,7 @@ const Index = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <ImageIcon className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
-          <p className="text-muted-foreground">Loading images...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading images..." />;
   }
 
   return (
