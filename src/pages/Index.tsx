@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, TrendingUp, Users } from "lucide-react";
+import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, TrendingUp, Users, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const Index = () => {
@@ -209,6 +209,14 @@ const Index = () => {
               className="bg-gradient-primary hover:opacity-90"
             >
               <Share2 size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => navigate("/challenges")}
+              title="Challenges"
+            >
+              <Trophy size={20} />
             </Button>
             <Button
               variant="secondary"

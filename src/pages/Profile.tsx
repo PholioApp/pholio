@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, LogOut, Image as ImageIcon, ShoppingBag, Upload, Camera } from "lucide-react";
+import { ArrowLeft, LogOut, Image as ImageIcon, ShoppingBag, Upload, Camera, DollarSign } from "lucide-react";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -154,6 +154,10 @@ const Profile = () => {
             Back
           </Button>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/seller-dashboard")}>
+              <DollarSign className="mr-2" size={18} />
+              Seller Dashboard
+            </Button>
             {isAdmin && (
               <Button variant="outline" onClick={() => navigate("/admin")}>
                 Admin Panel
