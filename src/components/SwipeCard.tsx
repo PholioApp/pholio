@@ -6,6 +6,7 @@ import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ReportDialog } from "@/components/ReportDialog";
+import { soundManager } from "@/lib/sounds";
 
 interface SwipeCardProps {
   image: {
@@ -185,7 +186,10 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
 
           <div className="flex gap-3">
             <Button
-              onClick={onSwipeLeft}
+              onClick={() => {
+                soundManager.play('swipe', 0.2);
+                onSwipeLeft();
+              }}
               variant="secondary"
               size="lg"
               className="flex-1"
@@ -194,7 +198,10 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
               Pass
             </Button>
             <Button
-              onClick={onSwipeRight}
+              onClick={() => {
+                soundManager.play('like');
+                onSwipeRight();
+              }}
               size="lg"
               className="flex-1 bg-accent hover:bg-accent/90"
             >
@@ -202,7 +209,10 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
               Like
             </Button>
             <Button
-              onClick={onBuy}
+              onClick={() => {
+                soundManager.play('purchase');
+                onBuy();
+              }}
               size="lg"
               className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow"
             >

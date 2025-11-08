@@ -8,6 +8,11 @@ import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, T
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import confetti from "canvas-confetti";
+import { ParallaxBackground } from "@/components/ParallaxBackground";
+import { AchievementNotification } from "@/components/AchievementNotification";
+import { AchievementsDialog } from "@/components/AchievementsDialog";
+import { useAchievements } from "@/hooks/useAchievements";
+import { soundManager } from "@/lib/sounds";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -18,6 +23,12 @@ const Index = () => {
   const [logoClicks, setLogoClicks] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { currentAchievement, clearAchievement, checkLikes, checkPurchases } = useAchievements();
+
+  useEffect(() => {
+    // Initialize sound manager
+    soundManager.init();
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -126,12 +137,16 @@ const Index = () => {
   };
 
   const handleSwipeLeft = () => {
+    soundManager.play('swipe', 0.2);
     setCurrentIndex((prev) => prev + 1);
   };
 
   const handleSwipeRight = async () => {
     const currentImage = images[currentIndex];
     if (!currentImage || !user) return;
+
+    // Play like sound
+    soundManager.play('like');
 
     // Heart confetti!
     confetti({
@@ -156,6 +171,9 @@ const Index = () => {
         title: "Liked! 💖",
         description: "Image added to your favorites",
       });
+
+      // Check for achievements
+      await checkLikes();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -170,6 +188,9 @@ const Index = () => {
   const handleBuy = async () => {
     const currentImage = images[currentIndex];
     if (!currentImage || !user) return;
+
+    // Play purchase sound
+    soundManager.play('purchase');
 
     // Money confetti!
     confetti({
@@ -195,6 +216,9 @@ const Index = () => {
           title: "Redirecting to checkout 💰",
           description: "Complete your purchase in the new tab.",
         });
+
+        // Check for achievements
+        await checkPurchases();
       }
     } catch (error: any) {
       toast({
@@ -210,8 +234,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen p-4 relative">
+      <ParallaxBackground />
+      <AchievementNotification achievement={currentAchievement} onClose={clearAchievement} />
+      <div className="max-w-md mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-4">
           <h1 
@@ -245,16 +271,23 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
-              onClick={handleShare}
+              onClick={() => {
+                soundManager.play('click');
+                handleShare();
+              }}
               title="Share App"
               className="bg-gradient-primary hover:opacity-90 transition-all hover:scale-110 active:scale-95"
             >
               <Share2 size={20} />
             </Button>
+            <AchievementsDialog />
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => navigate("/challenges")}
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/challenges");
+              }}
               title="Challenges"
               className="transition-all hover:scale-110 active:scale-95 hover:rotate-12"
             >
@@ -263,7 +296,10 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => navigate("/search")}
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/search");
+              }}
               title="Search"
               className="transition-all hover:scale-110 active:scale-95"
             >
@@ -272,7 +308,10 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => navigate("/liked")}
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/liked");
+              }}
               title="Favorites"
               className="transition-all hover:scale-110 active:scale-95 hover:text-red-400"
             >
@@ -281,7 +320,10 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => navigate("/purchases")}
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/purchases");
+              }}
               title="Purchases"
               className="transition-all hover:scale-110 active:scale-95"
             >
@@ -290,7 +332,10 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => navigate("/upload")}
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/upload");
+              }}
               title="Upload"
               className="transition-all hover:scale-110 active:scale-95 hover:rotate-180"
             >
@@ -299,7 +344,10 @@ const Index = () => {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/profile");
+              }}
               title="Profile"
               className="transition-all hover:scale-110 active:scale-95"
             >
