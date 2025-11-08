@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, TrendingUp, Users, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import confetti from "canvas-confetti";
 
 const Index = () => {
   const [user, setUser] = useState<any>(null);
@@ -14,6 +15,7 @@ const Index = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalImages: 0, totalUsers: 0, totalLikes: 0 });
+  const [logoClicks, setLogoClicks] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -131,6 +133,16 @@ const Index = () => {
     const currentImage = images[currentIndex];
     if (!currentImage || !user) return;
 
+    // Heart confetti!
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ff0080', '#ff69b4', '#ff1493', '#c71585'],
+      shapes: ['circle'],
+      scalar: 1.2,
+    });
+
     try {
       // Insert like into database
       const { error } = await supabase.from("likes").insert({
@@ -141,7 +153,7 @@ const Index = () => {
       if (error) throw error;
 
       toast({
-        title: "Liked!",
+        title: "Liked! 💖",
         description: "Image added to your favorites",
       });
     } catch (error: any) {
@@ -159,6 +171,17 @@ const Index = () => {
     const currentImage = images[currentIndex];
     if (!currentImage || !user) return;
 
+    // Money confetti!
+    confetti({
+      particleCount: 150,
+      spread: 120,
+      origin: { y: 0.5 },
+      colors: ['#22c55e', '#10b981', '#84cc16', '#ffd700'],
+      shapes: ['square', 'circle'],
+      scalar: 1.5,
+      ticks: 200,
+    });
+
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { imageId: currentImage.id },
@@ -169,7 +192,7 @@ const Index = () => {
       if (data?.url) {
         window.open(data.url, "_blank");
         toast({
-          title: "Redirecting to checkout",
+          title: "Redirecting to checkout 💰",
           description: "Complete your purchase in the new tab.",
         });
       }
@@ -191,7 +214,31 @@ const Index = () => {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-4">
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <h1 
+            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
+            onClick={() => {
+              setLogoClicks(prev => prev + 1);
+              if (logoClicks + 1 === 5) {
+                // Easter egg: Camera explosion!
+                confetti({
+                  particleCount: 200,
+                  spread: 180,
+                  origin: { y: 0.3, x: 0.1 },
+                  colors: ['#a855f7', '#8b5cf6', '#7c3aed', '#6d28d9'],
+                  shapes: ['square', 'circle'],
+                  scalar: 2,
+                  gravity: 1.5,
+                  ticks: 300,
+                });
+                toast({
+                  title: "📸 You found a secret! 📸",
+                  description: "Keep clicking for more surprises...",
+                });
+                setLogoClicks(0);
+              }
+            }}
+            title="Click me multiple times... 👀"
+          >
             SwipeSnap
           </h1>
           <div className="flex gap-2">
@@ -200,7 +247,7 @@ const Index = () => {
               size="icon"
               onClick={handleShare}
               title="Share App"
-              className="bg-gradient-primary hover:opacity-90"
+              className="bg-gradient-primary hover:opacity-90 transition-all hover:scale-110 active:scale-95"
             >
               <Share2 size={20} />
             </Button>
@@ -209,6 +256,7 @@ const Index = () => {
               size="icon"
               onClick={() => navigate("/challenges")}
               title="Challenges"
+              className="transition-all hover:scale-110 active:scale-95 hover:rotate-12"
             >
               <Trophy size={20} />
             </Button>
@@ -217,6 +265,7 @@ const Index = () => {
               size="icon"
               onClick={() => navigate("/search")}
               title="Search"
+              className="transition-all hover:scale-110 active:scale-95"
             >
               <Search size={20} />
             </Button>
@@ -225,6 +274,7 @@ const Index = () => {
               size="icon"
               onClick={() => navigate("/liked")}
               title="Favorites"
+              className="transition-all hover:scale-110 active:scale-95 hover:text-red-400"
             >
               <Heart size={20} />
             </Button>
@@ -233,6 +283,7 @@ const Index = () => {
               size="icon"
               onClick={() => navigate("/purchases")}
               title="Purchases"
+              className="transition-all hover:scale-110 active:scale-95"
             >
               <ShoppingBag size={20} />
             </Button>
@@ -241,6 +292,7 @@ const Index = () => {
               size="icon"
               onClick={() => navigate("/upload")}
               title="Upload"
+              className="transition-all hover:scale-110 active:scale-95 hover:rotate-180"
             >
               <Upload size={20} />
             </Button>
@@ -249,6 +301,7 @@ const Index = () => {
               size="icon"
               onClick={() => navigate("/profile")}
               title="Profile"
+              className="transition-all hover:scale-110 active:scale-95"
             >
               <User size={20} />
             </Button>
@@ -257,23 +310,23 @@ const Index = () => {
 
         {/* Platform Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <Card className="p-3 bg-gradient-card border-border">
+          <Card className="p-3 bg-gradient-card border-border transition-all hover:scale-105 hover:shadow-glow cursor-pointer">
             <div className="flex items-center gap-2 mb-1">
-              <ImageIcon size={16} className="text-primary" />
+              <ImageIcon size={16} className="text-primary animate-pulse" />
               <span className="text-xs text-muted-foreground">Images</span>
             </div>
             <p className="text-xl font-bold">{stats.totalImages}</p>
           </Card>
-          <Card className="p-3 bg-gradient-card border-border">
+          <Card className="p-3 bg-gradient-card border-border transition-all hover:scale-105 hover:shadow-glow cursor-pointer">
             <div className="flex items-center gap-2 mb-1">
-              <Users size={16} className="text-primary" />
+              <Users size={16} className="text-primary animate-pulse" style={{ animationDelay: '0.2s' }} />
               <span className="text-xs text-muted-foreground">Creators</span>
             </div>
             <p className="text-xl font-bold">{stats.totalUsers}</p>
           </Card>
-          <Card className="p-3 bg-gradient-card border-border">
+          <Card className="p-3 bg-gradient-card border-border transition-all hover:scale-105 hover:shadow-glow cursor-pointer">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp size={16} className="text-primary" />
+              <TrendingUp size={16} className="text-primary animate-pulse" style={{ animationDelay: '0.4s' }} />
               <span className="text-xs text-muted-foreground">Likes</span>
             </div>
             <p className="text-xl font-bold">{stats.totalLikes}</p>
