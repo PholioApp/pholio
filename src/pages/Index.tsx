@@ -251,7 +251,7 @@ const Index = () => {
       <AchievementNotification achievement={currentAchievement} onClose={clearAchievement} />
       <div className="max-w-md mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 pt-4">
+        <div className="flex items-center justify-between mb-6 pt-4 animate-fade-in">
           <h1 
             className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
             onClick={() => {
@@ -370,22 +370,22 @@ const Index = () => {
         </div>
 
         {/* Platform Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <Card className="p-3 bg-gradient-card border-border transition-all hover:scale-105 hover:shadow-glow cursor-pointer">
+        <div className="grid grid-cols-3 gap-3 mb-6 animate-slide-up">
+          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in">
             <div className="flex items-center gap-2 mb-1">
               <ImageIcon size={16} className="text-primary animate-pulse" />
               <span className="text-xs text-muted-foreground">Images</span>
             </div>
             <p className="text-xl font-bold">{stats.totalImages}</p>
           </Card>
-          <Card className="p-3 bg-gradient-card border-border transition-all hover:scale-105 hover:shadow-glow cursor-pointer">
+          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in" style={{ animationDelay: '0.1s' }}>
             <div className="flex items-center gap-2 mb-1">
               <Users size={16} className="text-primary animate-pulse" style={{ animationDelay: '0.2s' }} />
               <span className="text-xs text-muted-foreground">Creators</span>
             </div>
             <p className="text-xl font-bold">{stats.totalUsers}</p>
           </Card>
-          <Card className="p-3 bg-gradient-card border-border transition-all hover:scale-105 hover:shadow-glow cursor-pointer">
+          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp size={16} className="text-primary animate-pulse" style={{ animationDelay: '0.4s' }} />
               <span className="text-xs text-muted-foreground">Likes</span>
