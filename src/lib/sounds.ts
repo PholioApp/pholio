@@ -1,92 +1,94 @@
-// Sound effect manager using Web Audio API
+import wrongAnswerSound from '@/assets/sounds/wrong-answer.mp3';
+import correctSound from '@/assets/sounds/correct.mp3';
+import clickSound from '@/assets/sounds/click.mp3';
+import backgroundMusic from '@/assets/sounds/background-music.mp3';
+
+// Sound effect manager using HTML5 Audio
 class SoundManager {
-  private audioContext: AudioContext | null = null;
-  private sounds: Map<string, AudioBuffer> = new Map();
+  private sounds: Map<string, HTMLAudioElement> = new Map();
+  private backgroundAudio: HTMLAudioElement | null = null;
+  private isMusicMuted: boolean = false;
 
   constructor() {
     if (typeof window !== 'undefined') {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.init();
     }
-  }
-
-  // Generate a simple beep/click sound
-  private createSound(frequency: number, duration: number, type: OscillatorType = 'sine'): AudioBuffer {
-    if (!this.audioContext) return null as any;
-    
-    const sampleRate = this.audioContext.sampleRate;
-    const numSamples = duration * sampleRate;
-    const buffer = this.audioContext.createBuffer(1, numSamples, sampleRate);
-    const data = buffer.getChannelData(0);
-
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / sampleRate;
-      const envelope = Math.exp(-t * 5); // Fade out
-      data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope * 0.3;
-    }
-
-    return buffer;
   }
 
   // Initialize sounds
   init() {
-    if (!this.audioContext) return;
-
-    // Camera shutter sound (quick high-low pitch)
-    this.sounds.set('shutter', this.createSound(800, 0.1, 'square'));
+    // Pass sound (wrong answer)
+    this.sounds.set('pass', new Audio(wrongAnswerSound));
     
-    // Like sound (pleasant chime)
-    this.sounds.set('like', this.createSound(880, 0.15, 'sine'));
+    // Like sound (correct)
+    this.sounds.set('like', new Audio(correctSound));
     
-    // Purchase success (ascending notes)
-    this.sounds.set('purchase', this.createSound(660, 0.2, 'sine'));
+    // Button click
+    this.sounds.set('click', new Audio(clickSound));
     
-    // Swipe sound (soft whoosh)
-    this.sounds.set('swipe', this.createSound(200, 0.1, 'sine'));
+    // Purchase success (use correct sound)
+    this.sounds.set('purchase', new Audio(correctSound));
     
-    // Achievement unlock (triumphant)
-    this.sounds.set('achievement', this.createSound(1047, 0.3, 'sine'));
+    // Achievement unlock (use correct sound)
+    this.sounds.set('achievement', new Audio(correctSound));
     
-    // Button click (subtle)
-    this.sounds.set('click', this.createSound(400, 0.05, 'square'));
+    // Background music
+    this.backgroundAudio = new Audio(backgroundMusic);
+    this.backgroundAudio.loop = true;
+    this.backgroundAudio.volume = 0.3;
+    
+    // Load music mute state from localStorage
+    const savedMuteState = localStorage.getItem('musicMuted');
+    this.isMusicMuted = savedMuteState === 'true';
   }
 
-  play(soundName: string, volume: number = 0.3) {
-    if (!this.audioContext || !this.sounds.has(soundName)) {
-      this.init(); // Initialize if not done yet
-      if (!this.sounds.has(soundName)) return;
-    }
+  play(soundName: string, volume: number = 0.5) {
+    const sound = this.sounds.get(soundName);
+    if (!sound) return;
 
-    const source = this.audioContext!.createBufferSource();
-    const gainNode = this.audioContext!.createGain();
+    // Clone the audio to allow overlapping sounds
+    const audioClone = sound.cloneNode() as HTMLAudioElement;
+    audioClone.volume = volume;
+    audioClone.play().catch(err => console.log('Audio play failed:', err));
+  }
+
+  // Start background music
+  startBackgroundMusic() {
+    if (this.backgroundAudio && !this.isMusicMuted) {
+      this.backgroundAudio.play().catch(err => console.log('Background music play failed:', err));
+    }
+  }
+
+  // Stop background music
+  stopBackgroundMusic() {
+    if (this.backgroundAudio) {
+      this.backgroundAudio.pause();
+      this.backgroundAudio.currentTime = 0;
+    }
+  }
+
+  // Toggle music mute
+  toggleMusicMute() {
+    this.isMusicMuted = !this.isMusicMuted;
+    localStorage.setItem('musicMuted', String(this.isMusicMuted));
     
-    source.buffer = this.sounds.get(soundName)!;
-    gainNode.gain.value = volume;
+    if (this.isMusicMuted) {
+      this.stopBackgroundMusic();
+    } else {
+      this.startBackgroundMusic();
+    }
     
-    source.connect(gainNode);
-    gainNode.connect(this.audioContext!.destination);
-    source.start();
+    return this.isMusicMuted;
+  }
+
+  // Get current mute state
+  isMusicMutedState() {
+    return this.isMusicMuted;
   }
 
   // Play achievement with special effect
   playAchievement() {
-    if (!this.audioContext) return;
-    
-    // Play three ascending notes
-    const frequencies = [523, 659, 784]; // C, E, G
-    frequencies.forEach((freq, index) => {
-      setTimeout(() => {
-        const source = this.audioContext!.createBufferSource();
-        const gainNode = this.audioContext!.createGain();
-        
-        const buffer = this.createSound(freq, 0.15, 'sine');
-        source.buffer = buffer;
-        gainNode.gain.value = 0.4;
-        
-        source.connect(gainNode);
-        gainNode.connect(this.audioContext!.destination);
-        source.start();
-      }, index * 100);
-    });
+    this.play('achievement', 0.6);
   }
 }
 

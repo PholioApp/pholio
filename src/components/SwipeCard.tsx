@@ -187,7 +187,7 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
           <div className="flex gap-3">
             <Button
               onClick={() => {
-                soundManager.play('swipe', 0.2);
+                soundManager.play('pass', 0.5);
                 onSwipeLeft();
               }}
               variant="secondary"

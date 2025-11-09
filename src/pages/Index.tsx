@@ -11,6 +11,7 @@ import confetti from "canvas-confetti";
 import { ParallaxBackground } from "@/components/ParallaxBackground";
 import { AchievementNotification } from "@/components/AchievementNotification";
 import { AchievementsDialog } from "@/components/AchievementsDialog";
+import { SettingsDialog } from "@/components/SettingsDialog";
 import { useAchievements } from "@/hooks/useAchievements";
 import { soundManager } from "@/lib/sounds";
 
@@ -28,6 +29,17 @@ const Index = () => {
   useEffect(() => {
     // Initialize sound manager
     soundManager.init();
+    
+    // Start background music with user interaction (click anywhere on the page once)
+    const startMusic = () => {
+      soundManager.startBackgroundMusic();
+      document.removeEventListener('click', startMusic);
+    };
+    document.addEventListener('click', startMusic);
+    
+    return () => {
+      document.removeEventListener('click', startMusic);
+    };
   }, []);
 
   useEffect(() => {
@@ -137,7 +149,7 @@ const Index = () => {
   };
 
   const handleSwipeLeft = () => {
-    soundManager.play('swipe', 0.2);
+    soundManager.play('pass', 0.5);
     setCurrentIndex((prev) => prev + 1);
   };
 
@@ -341,6 +353,7 @@ const Index = () => {
             >
               <Upload size={20} />
             </Button>
+            <SettingsDialog />
             <Button
               variant="secondary"
               size="icon"
