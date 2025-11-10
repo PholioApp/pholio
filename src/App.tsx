@@ -15,6 +15,9 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import Admin from "./pages/Admin";
 import SellerDashboard from "./pages/SellerDashboard";
 import Challenges from "./pages/Challenges";
+import Promotions from "./pages/Promotions";
+import Leaderboard from "./pages/Leaderboard";
+import Trending from "./pages/Trending";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +41,9 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
           <Route path="/challenges" element={<Challenges />} />
+          <Route path="/promotions" element={<Promotions />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/trending" element={<Trending />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

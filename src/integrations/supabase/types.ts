@@ -301,6 +301,53 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          amount_paid: number
+          clicks: number
+          created_at: string
+          end_date: string
+          id: string
+          image_id: string
+          impressions: number
+          seller_id: string
+          start_date: string
+          status: string
+        }
+        Insert: {
+          amount_paid: number
+          clicks?: number
+          created_at?: string
+          end_date: string
+          id?: string
+          image_id: string
+          impressions?: number
+          seller_id: string
+          start_date?: string
+          status?: string
+        }
+        Update: {
+          amount_paid?: number
+          clicks?: number
+          created_at?: string
+          end_date?: string
+          id?: string
+          image_id?: string
+          impressions?: number
+          seller_id?: string
+          start_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_image_id_fkey"
+            columns: ["image_id"]
+            isOneToOne: false
+            referencedRelation: "images"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchases: {
         Row: {
           amount: number
@@ -384,6 +431,41 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      seller_earnings: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          purchase_id: string
+          seller_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          purchase_id: string
+          seller_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          purchase_id?: string
+          seller_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_earnings_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_achievements: {
         Row: {
