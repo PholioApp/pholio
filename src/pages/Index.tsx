@@ -310,6 +310,30 @@ const Index = () => {
               size="icon"
               onClick={() => {
                 soundManager.play('click');
+                navigate("/leaderboard");
+              }}
+              title="Leaderboard"
+              className="transition-all hover:scale-110 active:scale-95 animate-pulse-slow"
+            >
+              <Users size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/trending");
+              }}
+              title="Trending"
+              className="transition-all hover:scale-110 active:scale-95"
+            >
+              <TrendingUp size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => {
+                soundManager.play('click');
                 navigate("/search");
               }}
               title="Search"
