@@ -80,32 +80,26 @@ const Promotions = () => {
   const handlePromote = async () => {
     if (!selectedImage) return;
 
-    const amount = promotionDays * 5; // $5 per day
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + promotionDays);
-
     try {
-      // Here you would integrate with Stripe for payment
-      // For now, we'll just create the promotion record
-      const { error } = await supabase
-        .from("promotions")
-        .insert({
-          image_id: selectedImage.id,
-          seller_id: user.id,
-          amount_paid: amount,
-          end_date: endDate.toISOString(),
-          status: "active",
-        });
+      // Create Stripe checkout session for promotion
+      const { data, error } = await supabase.functions.invoke("create-promotion-checkout", {
+        body: { 
+          imageId: selectedImage.id,
+          days: promotionDays 
+        },
+      });
 
       if (error) throw error;
 
-      toast({
-        title: "Success!",
-        description: `Image promoted for ${promotionDays} days!`,
-      });
-
-      await fetchData(user.id);
-      setSelectedImage(null);
+      if (data?.url) {
+        // Open Stripe checkout in new tab
+        window.open(data.url, "_blank");
+        toast({
+          title: "Redirecting to checkout 💳",
+          description: "Complete your payment in the new tab.",
+        });
+        setSelectedImage(null);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
