@@ -56,6 +56,21 @@ const PaymentSuccess = () => {
               description: "Your image is now being promoted to more users.",
             });
           }
+        } else if (paymentType === "ad") {
+          setIsPromotion(true);
+          const { data, error } = await supabase.functions.invoke("verify-ad-payment", {
+            body: { sessionId },
+          });
+
+          if (error) throw error;
+
+          if (data?.success) {
+            setVerified(true);
+            toast({
+              title: "Ad activated! 📢",
+              description: "Your ad is now live and reaching users.",
+            });
+          }
         } else {
           // Regular image purchase
           if (!imageId) {

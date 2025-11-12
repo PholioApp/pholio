@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, User, Image as ImageIcon, ShoppingBag, Heart, Search, Share2, TrendingUp, Users, Trophy } from "lucide-react";
+import { Settings, TrendingUp, Trophy, Search, Heart, Upload, LogOut, Users, Share2, ShoppingBag, User, Image as ImageIcon } from "lucide-react";
+import { AdBanner } from "@/components/AdBanner";
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import confetti from "canvas-confetti";
@@ -249,6 +250,12 @@ const Index = () => {
     <div className="min-h-screen p-4 relative">
       <ParallaxBackground />
       <AchievementNotification achievement={currentAchievement} onClose={clearAchievement} />
+      
+      {/* Ad Banner */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-20">
+        <AdBanner />
+      </div>
+
       <div className="max-w-md mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-4 animate-fade-in">

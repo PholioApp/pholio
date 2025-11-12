@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, LogOut, Image as ImageIcon, ShoppingBag, Upload, Camera, DollarSign, TrendingUp } from "lucide-react";
+import { ArrowLeft, Camera, TrendingUp, Eye, Heart, DollarSign, User, Upload, LogOut, Settings as SettingsIcon, Megaphone, Image as ImageIcon, ShoppingBag } from "lucide-react";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -161,6 +161,10 @@ const Profile = () => {
             <Button variant="outline" onClick={() => navigate("/promotions")}>
               <TrendingUp className="mr-2" size={18} />
               Promote Images
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/ads")}>
+              <Megaphone className="mr-2" size={18} />
+              Advertise Site
             </Button>
             {isAdmin && (
               <Button variant="outline" onClick={() => navigate("/admin")}>

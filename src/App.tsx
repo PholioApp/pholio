@@ -18,6 +18,7 @@ import Challenges from "./pages/Challenges";
 import Promotions from "./pages/Promotions";
 import Leaderboard from "./pages/Leaderboard";
 import Trending from "./pages/Trending";
+import Ads from "./pages/Ads";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/promotions" element={<Promotions />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/trending" element={<Trending />} />
+          <Route path="/ads" element={<Ads />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

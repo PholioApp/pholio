@@ -512,10 +512,6 @@ const Auth = () => {
                   Encrypted
                 </Badge>
                 <Badge variant="outline" className="text-xs gap-1">
-                  <Heart className="w-3 h-3" />
-                  Ad-free
-                </Badge>
-                <Badge variant="outline" className="text-xs gap-1">
                   <Star className="w-3 h-3" />
                   Premium
                 </Badge>

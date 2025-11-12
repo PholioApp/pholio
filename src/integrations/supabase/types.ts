@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      ads: {
+        Row: {
+          advertiser_id: string
+          amount_paid: number
+          clicks: number
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          image_url: string | null
+          impressions: number
+          site_url: string
+          start_date: string
+          status: string
+          title: string
+        }
+        Insert: {
+          advertiser_id: string
+          amount_paid: number
+          clicks?: number
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          site_url: string
+          start_date?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          advertiser_id?: string
+          amount_paid?: number
+          clicks?: number
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          site_url?: string
+          start_date?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       challenge_submissions: {
         Row: {
           challenge_id: string
