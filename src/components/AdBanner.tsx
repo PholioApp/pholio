@@ -45,14 +45,8 @@ export const AdBanner = () => {
         .update({ clicks: ad.clicks + 1 })
         .eq("id", ad.id);
 
-      // Ensure URL has protocol
-      let url = ad.site_url;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-
       // Open link
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(ad.site_url, "_blank", "noopener,noreferrer");
     }
   };
 
