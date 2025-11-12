@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ImageComments } from "@/components/ImageComments";
+import { FollowButton } from "@/components/FollowButton";
 import { soundManager } from "@/lib/sounds";
 
 interface SwipeCardProps {
@@ -146,8 +147,16 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
               <span className="text-sm font-medium">@{image.seller.username}</span>
             </button>
             
-            {/* Share and Report buttons */}
+            {/* Follow, Share and Report buttons */}
             <div className="flex gap-2">
+              {currentUserId && currentUserId !== image.seller_id && (
+                <FollowButton 
+                  userId={image.seller_id} 
+                  currentUserId={currentUserId} 
+                  variant="secondary"
+                  showText={false}
+                />
+              )}
               <Button
                 size="icon"
                 variant="secondary"

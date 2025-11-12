@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, TrendingUp, Trophy, Search, Heart, Upload, LogOut, Users, Share2, ShoppingBag, User, Image as ImageIcon } from "lucide-react";
+import { Settings, TrendingUp, Trophy, Search, Heart, Upload, LogOut, Users, Share2, ShoppingBag, User, Image as ImageIcon, UserPlus } from "lucide-react";
 import { AdBanner } from "@/components/AdBanner";
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -347,6 +347,18 @@ const Index = () => {
               className="transition-all hover:scale-110 active:scale-95"
             >
               <Search size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/following");
+              }}
+              title="Following"
+              className="transition-all hover:scale-110 active:scale-95"
+            >
+              <UserPlus size={20} />
             </Button>
             <Button
               variant="secondary"

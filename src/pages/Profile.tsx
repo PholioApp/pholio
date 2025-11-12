@@ -15,6 +15,7 @@ const Profile = () => {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [stats, setStats] = useState({ followers: 0, following: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -65,6 +66,17 @@ const Profile = () => {
         .order("created_at", { ascending: false });
 
       setPurchases(purchasesData || []);
+
+      // Fetch follower/following stats
+      const [followersCount, followingCount] = await Promise.all([
+        supabase.from("follows").select("*", { count: "exact", head: true }).eq("following_id", user.id),
+        supabase.from("follows").select("*", { count: "exact", head: true }).eq("follower_id", user.id),
+      ]);
+
+      setStats({
+        followers: followersCount.count || 0,
+        following: followingCount.count || 0,
+      });
     };
 
     fetchProfile();
@@ -210,6 +222,26 @@ const Profile = () => {
             <div>
               <h1 className="text-2xl font-bold">@{profile.username}</h1>
               <p className="text-muted-foreground">{profile.email}</p>
+              <div className="flex gap-4 mt-2 text-sm">
+                <button
+                  onClick={() => navigate("/following")}
+                  className="hover:text-primary transition-colors"
+                >
+                  <span className="font-bold">{stats.followers}</span>{" "}
+                  <span className="text-muted-foreground">followers</span>
+                </button>
+                <button
+                  onClick={() => navigate("/following")}
+                  className="hover:text-primary transition-colors"
+                >
+                  <span className="font-bold">{stats.following}</span>{" "}
+                  <span className="text-muted-foreground">following</span>
+                </button>
+                <div>
+                  <span className="font-bold">{myImages.length}</span>{" "}
+                  <span className="text-muted-foreground">photos</span>
+                </div>
+              </div>
               <p className="text-xs text-muted-foreground mt-1">Click avatar to change picture</p>
             </div>
           </div>

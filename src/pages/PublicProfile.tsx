@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Image as ImageIcon, Users } from "lucide-react";
+import { FollowButton } from "@/components/FollowButton";
 
 const PublicProfile = () => {
   const { userId } = useParams();
@@ -12,12 +13,39 @@ const PublicProfile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [stats, setStats] = useState({ followers: 0, following: 0 });
 
   useEffect(() => {
+    getCurrentUser();
     if (userId) {
       fetchProfile();
+      fetchStats();
     }
   }, [userId]);
+
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setCurrentUserId(user.id);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const [followersCount, followingCount] = await Promise.all([
+        supabase.from("follows").select("*", { count: "exact", head: true }).eq("following_id", userId),
+        supabase.from("follows").select("*", { count: "exact", head: true }).eq("follower_id", userId),
+      ]);
+
+      setStats({
+        followers: followersCount.count || 0,
+        following: followingCount.count || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -84,10 +112,27 @@ const PublicProfile = () => {
                 {profile.username?.[0]?.toUpperCase() || "?"}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-bold">@{profile.username}</h1>
               <p className="text-muted-foreground">{profile.email}</p>
+              <div className="flex gap-4 mt-2 text-sm">
+                <div>
+                  <span className="font-bold">{stats.followers}</span>{" "}
+                  <span className="text-muted-foreground">followers</span>
+                </div>
+                <div>
+                  <span className="font-bold">{stats.following}</span>{" "}
+                  <span className="text-muted-foreground">following</span>
+                </div>
+                <div>
+                  <span className="font-bold">{images.length}</span>{" "}
+                  <span className="text-muted-foreground">photos</span>
+                </div>
+              </div>
             </div>
+            {currentUserId && currentUserId !== userId && (
+              <FollowButton userId={userId!} currentUserId={currentUserId} />
+            )}
           </div>
           {profile.bio && (
             <p className="text-muted-foreground">{profile.bio}</p>
