@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search as SearchIcon, User, Image as ImageIcon, ShoppingCart, Filter, X } from "lucide-react";
+import { ArrowLeft, Search as SearchIcon, User, Image as ImageIcon, ShoppingCart, Filter, X, Sparkles, Send } from "lucide-react";
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,6 +19,10 @@ const Search = () => {
   const [priceRange, setPriceRange] = useState<string>("all");
   const [selectedTag, setSelectedTag] = useState<string>("all");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [aiMessage, setAiMessage] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -150,17 +154,88 @@ const Search = () => {
     setSellers([]);
   };
 
+  const handleAIAssistant = async () => {
+    if (!aiMessage.trim()) return;
+    
+    setAiLoading(true);
+    try {
+      const context = `Query: ${searchQuery || 'none'}, Price: ${priceRange}, Tag: ${selectedTag}, Results: ${images.length} images, ${sellers.length} sellers`;
+      
+      const { data, error } = await supabase.functions.invoke("search-assistant", {
+        body: { message: aiMessage, context },
+      });
+
+      if (error) throw error;
+
+      setAiResponse(data.response);
+      setAiMessage("");
+    } catch (error: any) {
+      toast({
+        title: "AI Assistant Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto py-8">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="secondary" size="icon" onClick={() => navigate("/")}>
-            <ArrowLeft size={18} />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Button variant="secondary" size="icon" onClick={() => navigate("/")}>
+              <ArrowLeft size={18} />
+            </Button>
+            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Search
+            </h1>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAIAssistant(!showAIAssistant)}
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            AI Search Help
           </Button>
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Search
-          </h1>
         </div>
+
+        {showAIAssistant && (
+          <Card className="mb-6 p-4 bg-muted/50 animate-fade-in">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+              <h3 className="font-semibold">AI Search Assistant</h3>
+            </div>
+            
+            {aiResponse && (
+              <div className="mb-4 p-3 bg-background rounded border animate-slide-down">
+                <p className="text-sm whitespace-pre-wrap">{aiResponse}</p>
+              </div>
+            )}
+            
+            <div className="flex gap-2">
+              <Input
+                placeholder="Ask for help finding photos, tags, price ranges..."
+                value={aiMessage}
+                onChange={(e) => setAiMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleAIAssistant()}
+                disabled={aiLoading}
+                className="transition-all duration-300 focus:scale-102"
+              />
+              <Button
+                type="button"
+                onClick={handleAIAssistant}
+                disabled={aiLoading || !aiMessage.trim()}
+                size="icon"
+                className="hover:scale-105 transition-transform"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </Card>
+        )}
 
         <div className="space-y-4 mb-8">
           <div className="flex-1 relative">
