@@ -191,12 +191,12 @@ const Profile = () => {
           </div>
         </div>
 
-        <Card className="p-6 bg-gradient-card shadow-card border-border mb-8">
+        <Card className="p-6 bg-gradient-card shadow-card border-border mb-8 animate-scale-up hover:shadow-glow transition-all">
           <div className="flex items-center gap-4 mb-4">
             <div className="relative group">
-              <Avatar className="w-20 h-20">
+              <Avatar className="w-20 h-20 transition-transform duration-300 group-hover:scale-110">
                 <AvatarImage src={profile.avatar_url} alt={profile.username} />
-                <AvatarFallback className="bg-gradient-primary text-2xl font-bold shadow-glow">
+                <AvatarFallback className="bg-gradient-primary text-2xl font-bold shadow-glow animate-pulse">
                   {profile.username?.[0]?.toUpperCase() || "?"}
                 </AvatarFallback>
               </Avatar>
@@ -208,7 +208,7 @@ const Profile = () => {
                 {uploading ? (
                   <Upload className="text-white animate-pulse" size={24} />
                 ) : (
-                  <Camera className="text-white" size={24} />
+                  <Camera className="text-white animate-bounce-subtle" size={24} />
                 )}
               </button>
               <input
@@ -225,19 +225,20 @@ const Profile = () => {
               <div className="flex gap-4 mt-2 text-sm">
                 <button
                   onClick={() => navigate("/following")}
-                  className="hover:text-primary transition-colors"
+                  className="hover:text-primary transition-all hover:scale-110 animate-slide-down"
                 >
                   <span className="font-bold">{stats.followers}</span>{" "}
                   <span className="text-muted-foreground">followers</span>
                 </button>
                 <button
                   onClick={() => navigate("/following")}
-                  className="hover:text-primary transition-colors"
+                  className="hover:text-primary transition-all hover:scale-110 animate-slide-down"
+                  style={{ animationDelay: "0.05s" }}
                 >
                   <span className="font-bold">{stats.following}</span>{" "}
                   <span className="text-muted-foreground">following</span>
                 </button>
-                <div>
+                <div className="animate-slide-down" style={{ animationDelay: "0.1s" }}>
                   <span className="font-bold">{myImages.length}</span>{" "}
                   <span className="text-muted-foreground">photos</span>
                 </div>

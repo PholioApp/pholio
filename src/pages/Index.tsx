@@ -308,7 +308,7 @@ const Index = () => {
                 navigate("/challenges");
               }}
               title="Challenges"
-              className="transition-all hover:scale-110 active:scale-95 hover:rotate-12"
+              className="transition-all hover:scale-110 active:scale-95 hover:rotate-12 animate-bounce-in"
             >
               <Trophy size={20} />
             </Button>
@@ -320,7 +320,7 @@ const Index = () => {
                 navigate("/leaderboard");
               }}
               title="Leaderboard"
-              className="transition-all hover:scale-110 active:scale-95 animate-pulse-slow"
+              className="transition-all hover:scale-110 active:scale-95 animate-pulse-slow animate-glow"
             >
               <Users size={20} />
             </Button>
@@ -332,7 +332,7 @@ const Index = () => {
                 navigate("/trending");
               }}
               title="Trending"
-              className="transition-all hover:scale-110 active:scale-95"
+              className="transition-all hover:scale-110 active:scale-95 hover:text-accent animate-hover-float"
             >
               <TrendingUp size={20} />
             </Button>
@@ -344,7 +344,7 @@ const Index = () => {
                 navigate("/search");
               }}
               title="Search"
-              className="transition-all hover:scale-110 active:scale-95"
+              className="transition-all hover:scale-110 active:scale-95 hover-rotate"
             >
               <Search size={20} />
             </Button>
@@ -414,21 +414,21 @@ const Index = () => {
 
         {/* Platform Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6 animate-slide-up">
-          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in">
+          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in hover-lift">
             <div className="flex items-center gap-2 mb-1">
               <ImageIcon size={16} className="text-primary animate-pulse" />
               <span className="text-xs text-muted-foreground">Images</span>
             </div>
             <p className="text-xl font-bold">{stats.totalImages}</p>
           </Card>
-          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in" style={{ animationDelay: '0.1s' }}>
+          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in hover-lift" style={{ animationDelay: '0.1s' }}>
             <div className="flex items-center gap-2 mb-1">
               <Users size={16} className="text-primary animate-pulse" style={{ animationDelay: '0.2s' }} />
               <span className="text-xs text-muted-foreground">Creators</span>
             </div>
             <p className="text-xl font-bold">{stats.totalUsers}</p>
           </Card>
-          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in" style={{ animationDelay: '0.2s' }}>
+          <Card className="p-3 bg-gradient-card border-border transition-all duration-300 hover:scale-105 hover:shadow-glow hover:-translate-y-1 cursor-pointer animate-bounce-in hover-lift" style={{ animationDelay: '0.2s' }}>
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp size={16} className="text-primary animate-pulse" style={{ animationDelay: '0.4s' }} />
               <span className="text-xs text-muted-foreground">Likes</span>

@@ -108,40 +108,41 @@ const Following = () => {
         </div>
 
         {images.length === 0 ? (
-          <Card className="p-12 text-center bg-gradient-card border-border">
-            <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <Card className="p-12 text-center bg-gradient-card border-border animate-scale-up">
+            <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground animate-bounce-subtle" />
             <h2 className="text-2xl font-bold mb-2">No Posts Yet</h2>
             <p className="text-muted-foreground mb-6">
               {followingCount === 0 
                 ? "Start following photographers to see their latest uploads here!"
                 : "The photographers you follow haven't posted anything yet."}
             </p>
-            <Button onClick={() => navigate("/search")} className="bg-gradient-primary">
+            <Button onClick={() => navigate("/search")} className="bg-gradient-primary hover:scale-110 transition-all">
               Discover Photographers
             </Button>
           </Card>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {images.map((image) => (
+            {images.map((image, index) => (
               <Card
                 key={image.id}
-                className="overflow-hidden bg-gradient-card border-border cursor-pointer transition-all hover:scale-105 hover:shadow-glow"
+                className="overflow-hidden bg-gradient-card border-border cursor-pointer transition-all hover:scale-105 hover:shadow-glow animate-scale-up"
+                style={{ animationDelay: `${index * 0.05}s` }}
                 onClick={() => navigate(`/profile/${image.seller_id}`)}
               >
                 <div className="aspect-square bg-secondary relative group">
                   <img
                     src={image.image_url}
                     alt={image.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-2 right-2 bg-gradient-primary rounded-lg px-2 py-1">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-2 right-2 bg-gradient-primary rounded-lg px-2 py-1 shadow-glow transform group-hover:scale-110 transition-transform">
                     <span className="text-xs font-bold text-white">${image.price}</span>
                   </div>
                 </div>
                 <div className="p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 rounded-full bg-secondary overflow-hidden">
+                    <div className="w-6 h-6 rounded-full bg-secondary overflow-hidden transition-transform hover:scale-125">
                       {image.seller.avatar_url ? (
                         <img
                           src={image.seller.avatar_url}

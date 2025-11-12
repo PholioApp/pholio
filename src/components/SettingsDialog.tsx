@@ -91,18 +91,18 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto animate-scale-up">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-slide-down">
             Settings
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="animate-fade-in">
             Customize your SwipeSnap experience
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">{/* Audio Settings */}
-          <div className="flex items-center gap-3 py-3 px-3 bg-gradient-card rounded-lg border border-border">
-            <div className="p-2 rounded-lg bg-primary/10">
+          <div className="flex items-center gap-3 py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all">
+            <div className="p-2 rounded-lg bg-primary/10 animate-glow">
               <Music className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 space-y-0.5">
@@ -117,13 +117,14 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
               id="music-toggle"
               checked={!isMusicMuted}
               onCheckedChange={handleMusicToggle}
+              className="transition-all hover:scale-110"
             />
           </div>
 
           {/* Autoplay */}
-          <div className="flex items-center gap-3 py-3 px-3 bg-gradient-card rounded-lg border border-border">
+          <div className="flex items-center gap-3 py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.05s" }}>
             <div className="p-2 rounded-lg bg-primary/10">
-              <Zap className="h-5 w-5 text-primary" />
+              <Zap className="h-5 w-5 text-primary animate-bounce-subtle" />
             </div>
             <div className="flex-1 space-y-0.5">
               <Label htmlFor="autoplay-toggle" className="text-base font-medium cursor-pointer">
@@ -141,9 +142,9 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           </div>
 
           {/* Notifications */}
-          <div className="flex items-center gap-3 py-3 px-3 bg-gradient-card rounded-lg border border-border">
+          <div className="flex items-center gap-3 py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.1s" }}>
             <div className="p-2 rounded-lg bg-primary/10">
-              <Bell className="h-5 w-5 text-primary" />
+              <Bell className="h-5 w-5 text-primary animate-wiggle" />
             </div>
             <div className="flex-1 space-y-0.5">
               <Label htmlFor="notifications-toggle" className="text-base font-medium cursor-pointer">
@@ -161,10 +162,10 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           </div>
           
           {/* Theme Mode */}
-          <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border">
+          <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.15s" }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-primary/10">
-                <Palette className="h-5 w-5 text-primary" />
+                <Palette className="h-5 w-5 text-primary animate-hover-float" />
               </div>
               <div className="flex-1 space-y-0.5">
                 <Label className="text-base font-medium">Display Mode</Label>
@@ -196,10 +197,10 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           </div>
 
           {/* Color Theme */}
-          <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border">
+          <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.2s" }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-primary/10">
-                <Sparkles className="h-5 w-5 text-primary" />
+                <Sparkles className="h-5 w-5 text-primary animate-glow" />
               </div>
               <div className="flex-1 space-y-0.5">
                 <Label className="text-base font-medium">Color Theme</Label>
@@ -225,10 +226,10 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           </div>
 
           {/* Privacy */}
-          <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border">
+          <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.25s" }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-primary/10">
-                <Shield className="h-5 w-5 text-primary" />
+                <Shield className="h-5 w-5 text-primary animate-float" />
               </div>
               <div className="flex-1 space-y-0.5">
                 <Label className="text-base font-medium">Privacy</Label>
@@ -266,8 +267,8 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           </div>
 
           {/* App Info */}
-          <div className="pt-4 border-t text-center">
-            <p className="text-xs text-muted-foreground">
+          <div className="pt-4 border-t text-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <p className="text-xs text-muted-foreground animate-pulse">
               SwipeSnap v1.0 • Made with 💜
             </p>
           </div>

@@ -128,47 +128,50 @@ export const ImageComments = ({ imageId, currentUserId }: ImageCommentsProps) =>
       <Button
         variant="outline"
         onClick={() => setShowComments(!showComments)}
-        className="w-full transition-all hover:scale-105 active:scale-95"
+        className="w-full transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow animate-slide-down"
       >
-        <MessageCircle className="mr-2" size={18} />
+        <MessageCircle className="mr-2 animate-bounce-subtle" size={18} />
         {showComments ? "Hide" : "Show"} Comments ({comments.length})
       </Button>
 
       {showComments && (
         <div className="space-y-3 animate-fade-in">
-          <form onSubmit={handleSubmit} className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-2 animate-slide-down">
             <Textarea
               placeholder="Write a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="bg-secondary border-border resize-none"
+              className="bg-secondary border-border resize-none transition-all focus:scale-[1.02] focus:shadow-glow"
               rows={2}
             />
             <Button
               type="submit"
               disabled={loading || !newComment.trim()}
-              className="w-full bg-gradient-primary"
+              className={`w-full bg-gradient-primary transition-all duration-300 hover:scale-105 active:scale-95 ${
+                loading ? "animate-pulse" : ""
+              }`}
             >
               <Send className="mr-2" size={18} />
-              Post Comment
+              {loading ? "Posting..." : "Post Comment"}
             </Button>
           </form>
 
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {comments.length === 0 ? (
-              <Card className="p-4 text-center bg-gradient-card border-border">
+              <Card className="p-4 text-center bg-gradient-card border-border animate-scale-up">
                 <p className="text-sm text-muted-foreground">
                   No comments yet. Be the first to comment!
                 </p>
               </Card>
             ) : (
-              comments.map((comment) => (
+              comments.map((comment, index) => (
                 <Card
                   key={comment.id}
-                  className="p-3 bg-gradient-card border-border"
+                  className="p-3 bg-gradient-card border-border animate-slide-in-left hover:shadow-glow transition-all"
+                  style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div className="flex items-start gap-3">
-                    <Avatar className="w-8 h-8">
+                    <Avatar className="w-8 h-8 transition-transform hover:scale-125">
                       <AvatarImage src={comment.profiles?.avatar_url} />
                       <AvatarFallback className="bg-gradient-primary text-xs">
                         {comment.profiles?.username?.[0]?.toUpperCase() || "?"}
@@ -191,7 +194,7 @@ export const ImageComments = ({ imageId, currentUserId }: ImageCommentsProps) =>
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(comment.id)}
-                          className="mt-2 h-7 text-xs hover:text-destructive"
+                          className="mt-2 h-7 text-xs hover:text-destructive transition-all hover:scale-105"
                         >
                           <Trash2 size={14} className="mr-1" />
                           Delete

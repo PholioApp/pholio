@@ -129,18 +129,18 @@ export const FollowButton = ({
       onClick={handleFollow}
       disabled={loading}
       variant={isFollowing ? "outline" : variant}
-      className={`transition-all hover:scale-105 active:scale-95 ${
-        isFollowing ? "" : "bg-gradient-primary"
-      }`}
+      className={`transition-all duration-300 hover:scale-110 active:scale-95 animate-scale-up ${
+        isFollowing ? "hover:bg-destructive/10" : "bg-gradient-primary hover:shadow-glow"
+      } ${loading ? "animate-pulse" : ""}`}
     >
       {isFollowing ? (
         <>
-          <UserMinus className={showText ? "mr-2" : ""} size={18} />
+          <UserMinus className={showText ? "mr-2 animate-wiggle" : ""} size={18} />
           {showText && `Following (${followerCount})`}
         </>
       ) : (
         <>
-          <UserPlus className={showText ? "mr-2" : ""} size={18} />
+          <UserPlus className={showText ? "mr-2 animate-bounce-subtle" : ""} size={18} />
           {showText && `Follow (${followerCount})`}
         </>
       )}
