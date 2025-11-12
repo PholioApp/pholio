@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Megaphone, Clock, Eye, MousePointer, TrendingUp, Target } from "lucide-react";
+import { ArrowLeft, Megaphone, Clock, Eye, MousePointer, TrendingUp, Target, Sparkles, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -33,6 +33,10 @@ const Ads = () => {
     imageUrl: "",
     days: 7,
   });
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [aiMessage, setAiMessage] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -124,6 +128,32 @@ const Ads = () => {
     }
   };
 
+  const handleAIAssistant = async () => {
+    if (!aiMessage.trim()) return;
+    
+    setAiLoading(true);
+    try {
+      const context = `Site URL: ${formData.siteUrl || 'not set'}, Title: ${formData.title || 'not set'}, Description: ${formData.description || 'not set'}`;
+      
+      const { data, error } = await supabase.functions.invoke("ad-assistant", {
+        body: { message: aiMessage, context },
+      });
+
+      if (error) throw error;
+
+      setAiResponse(data.response);
+      setAiMessage("");
+    } catch (error: any) {
+      toast({
+        title: "AI Assistant Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -154,13 +184,62 @@ const Ads = () => {
                 Create Ad
               </Button>
             </DialogTrigger>
-            <DialogContent className="animate-bounce-in">
+            <DialogContent className="animate-bounce-in max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="animate-slide-down">Create New Ad</DialogTitle>
-                <DialogDescription className="animate-fade-in">
-                  Promote your website to our community
-                </DialogDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <DialogTitle className="animate-slide-down">Create New Ad</DialogTitle>
+                    <DialogDescription className="animate-fade-in">
+                      Promote your website to our community
+                    </DialogDescription>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAIAssistant(!showAIAssistant)}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    AI Help
+                  </Button>
+                </div>
               </DialogHeader>
+              
+              {showAIAssistant && (
+                <div className="mb-4 p-4 border rounded-lg bg-muted/50 animate-fade-in">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                    <h3 className="font-semibold">AI Advertising Assistant</h3>
+                  </div>
+                  
+                  {aiResponse && (
+                    <div className="mb-4 p-3 bg-background rounded border animate-slide-down">
+                      <p className="text-sm whitespace-pre-wrap">{aiResponse}</p>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Ask for help with your ad copy, get suggestions..."
+                      value={aiMessage}
+                      onChange={(e) => setAiMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleAIAssistant()}
+                      disabled={aiLoading}
+                      className="transition-all duration-300 focus:scale-102"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAIAssistant}
+                      disabled={aiLoading || !aiMessage.trim()}
+                      size="icon"
+                      className="hover:scale-105 transition-transform"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="siteUrl">Website URL *</Label>

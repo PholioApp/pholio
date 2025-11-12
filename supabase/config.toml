@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.verify-ad-payment]
 verify_jwt = true
+
+[functions.ad-assistant]
+verify_jwt = true
