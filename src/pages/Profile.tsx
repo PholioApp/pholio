@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Camera, TrendingUp, Eye, Heart, DollarSign, User, Upload, LogOut, Settings as SettingsIcon, Megaphone, Image as ImageIcon, ShoppingBag } from "lucide-react";
+import { SettingsDialog } from "@/components/SettingsDialog";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -278,6 +279,25 @@ const Profile = () => {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Settings Section */}
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <SettingsIcon size={20} />
+              <h2 className="text-xl font-bold">Settings</h2>
+            </div>
+            <SettingsDialog 
+              triggerButton={
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-gradient-card border-border hover:scale-105 transition-all"
+                >
+                  <SettingsIcon className="mr-2" size={18} />
+                  Open Settings
+                </Button>
+              }
+            />
           </div>
         </div>
       </div>

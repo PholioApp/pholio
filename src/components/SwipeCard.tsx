@@ -6,6 +6,7 @@ import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ReportDialog } from "@/components/ReportDialog";
+import { ImageComments } from "@/components/ImageComments";
 import { soundManager } from "@/lib/sounds";
 
 interface SwipeCardProps {
@@ -30,6 +31,7 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
   const [exitX, setExitX] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
@@ -37,7 +39,15 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
 
   useEffect(() => {
     fetchLikeCount();
+    getCurrentUser();
   }, [image.id]);
+
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setCurrentUserId(user.id);
+    }
+  };
 
   const fetchLikeCount = async () => {
     const { count } = await supabase
@@ -220,6 +230,13 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
             </Button>
           </div>
         </div>
+
+        {/* Comments Section */}
+        {currentUserId && (
+          <div className="px-6 pb-4">
+            <ImageComments imageId={image.id} currentUserId={currentUserId} />
+          </div>
+        )}
       </Card>
 
       <ReportDialog

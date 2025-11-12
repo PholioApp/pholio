@@ -139,6 +139,68 @@ const Auth = () => {
     }
   }, []);
 
+  // Check ban status for already logged in users
+  useEffect(() => {
+    const checkBanStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("banned, banned_until, ban_reason")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.banned) {
+          if (profile.banned_until) {
+            const banExpiry = new Date(profile.banned_until);
+            const now = new Date();
+            
+            if (now >= banExpiry) {
+              // Ban expired, unban the user
+              await supabase
+                .from("profiles")
+                .update({ 
+                  banned: false, 
+                  banned_until: null, 
+                  ban_reason: null,
+                  banned_at: null,
+                  banned_by: null
+                })
+                .eq("id", user.id);
+              
+              navigate("/");
+            } else {
+              // Still banned, show message and sign out
+              const timeLeft = Math.ceil((banExpiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+              toast({
+                variant: "destructive",
+                title: "🚫 Account Banned",
+                description: `Your account is banned for ${timeLeft} more day${timeLeft > 1 ? 's' : ''}. Reason: ${profile.ban_reason || "No reason provided"}`,
+                duration: 10000,
+              });
+              await supabase.auth.signOut();
+            }
+          } else {
+            // Permanently banned
+            toast({
+              variant: "destructive",
+              title: "🚫 Account Permanently Banned",
+              description: `Your account has been permanently banned. Reason: ${profile.ban_reason || "No reason provided"}`,
+              duration: 10000,
+            });
+            await supabase.auth.signOut();
+          }
+        } else {
+          // Not banned, redirect to home
+          navigate("/");
+        }
+      }
+    };
+
+    checkBanStatus();
+  }, [navigate, toast]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -176,6 +238,70 @@ const Auth = () => {
         });
 
         if (error) throw error;
+
+        // Check if user is banned after login
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("banned, banned_until, ban_reason")
+            .eq("id", user.id)
+            .single();
+
+          if (profile?.banned) {
+            if (profile.banned_until) {
+              const banExpiry = new Date(profile.banned_until);
+              const now = new Date();
+              
+              if (now >= banExpiry) {
+                // Ban expired, unban
+                await supabase
+                  .from("profiles")
+                  .update({ 
+                    banned: false, 
+                    banned_until: null, 
+                    ban_reason: null,
+                    banned_at: null,
+                    banned_by: null
+                  })
+                  .eq("id", user.id);
+                
+                toast({
+                  title: "Welcome back!",
+                  description: "Your ban has expired. Welcome back to SwipeSnap!",
+                });
+                navigate("/");
+                return;
+              } else {
+                // Still banned
+                const timeLeft = Math.ceil((banExpiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                const hours = Math.ceil((banExpiry.getTime() - now.getTime()) / (1000 * 60 * 60));
+                const timeDisplay = timeLeft > 0 
+                  ? `${timeLeft} day${timeLeft > 1 ? 's' : ''}`
+                  : `${hours} hour${hours > 1 ? 's' : ''}`;
+                
+                toast({
+                  variant: "destructive",
+                  title: "🚫 Account Banned",
+                  description: `Your account is banned for ${timeDisplay}. Reason: ${profile.ban_reason || "Violation of community guidelines"}`,
+                  duration: 15000,
+                });
+                await supabase.auth.signOut();
+                return;
+              }
+            } else {
+              // Permanently banned
+              toast({
+                variant: "destructive",
+                title: "🚫 Account Permanently Banned",
+                description: `Your account has been permanently banned. Reason: ${profile.ban_reason || "Serious violation of terms of service"}. Contact support if you believe this is an error.`,
+                duration: 15000,
+              });
+              await supabase.auth.signOut();
+              return;
+            }
+          }
+        }
         
         toast({
           title: "Welcome back!",
