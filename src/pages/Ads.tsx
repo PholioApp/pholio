@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Megaphone, Clock, Eye, MousePointer } from "lucide-react";
+import { ArrowLeft, Megaphone, Clock, Eye, MousePointer, TrendingUp, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import {
   Dialog,
@@ -98,6 +99,21 @@ const Ads = () => {
           imageUrl: "",
           days: 7,
         });
+      } else if (data?.success) {
+        // Free ad created
+        toast({
+          title: "Ad created! 🎉",
+          description: "Your ad is now active.",
+        });
+        setDialogOpen(false);
+        setFormData({
+          siteUrl: "",
+          title: "",
+          description: "",
+          imageUrl: "",
+          days: 7,
+        });
+        await fetchAds(user.id);
       }
     } catch (error: any) {
       toast({
@@ -203,10 +219,10 @@ const Ads = () => {
                 <div className="p-4 bg-muted rounded-lg animate-pulse-slow">
                   <p className="text-sm text-muted-foreground">Cost</p>
                   <p className="text-2xl font-bold text-primary animate-glow">
-                    ${(formData.days * 10).toFixed(2)}
+                    ${(formData.days * 0.10).toFixed(2)}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    $10.00 per day
+                    $0.10 per day
                   </p>
                 </div>
                 <Button 
@@ -220,6 +236,59 @@ const Ads = () => {
           </Dialog>
         </div>
 
+        {/* Analytics Overview */}
+        {ads.length > 0 && (
+          <Card className="p-6 mb-6 animate-slide-up">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <TrendingUp className="h-6 w-6 text-primary animate-bounce-subtle" />
+              Analytics Overview
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 hover:scale-105 transition-transform">
+                <div className="flex items-center gap-2 mb-2">
+                  <Eye className="h-5 w-5 text-primary" />
+                  <p className="text-sm text-muted-foreground">Total Impressions</p>
+                </div>
+                <p className="text-3xl font-bold text-primary">
+                  {ads.reduce((sum: number, ad: any) => sum + ad.impressions, 0).toLocaleString()}
+                </p>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-accent/10 to-accent/5 hover:scale-105 transition-transform">
+                <div className="flex items-center gap-2 mb-2">
+                  <MousePointer className="h-5 w-5 text-accent" />
+                  <p className="text-sm text-muted-foreground">Total Clicks</p>
+                </div>
+                <p className="text-3xl font-bold text-accent">
+                  {ads.reduce((sum: number, ad: any) => sum + ad.clicks, 0).toLocaleString()}
+                </p>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 hover:scale-105 transition-transform">
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="h-5 w-5 text-green-500" />
+                  <p className="text-sm text-muted-foreground">Avg CTR</p>
+                </div>
+                <p className="text-3xl font-bold text-green-500">
+                  {(() => {
+                    const totalImpressions = ads.reduce((sum: number, ad: any) => sum + ad.impressions, 0);
+                    const totalClicks = ads.reduce((sum: number, ad: any) => sum + ad.clicks, 0);
+                    const ctr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+                    return `${ctr.toFixed(2)}%`;
+                  })()}
+                </p>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-purple-500/10 to-purple-500/5 hover:scale-105 transition-transform">
+                <div className="flex items-center gap-2 mb-2">
+                  <Megaphone className="h-5 w-5 text-purple-500" />
+                  <p className="text-sm text-muted-foreground">Total Spent</p>
+                </div>
+                <p className="text-3xl font-bold text-purple-500">
+                  ${ads.reduce((sum: number, ad: any) => sum + Number(ad.amount_paid), 0).toFixed(2)}
+                </p>
+              </Card>
+            </div>
+          </Card>
+        )}
+
         <Card className="p-6 animate-slide-up">
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             <Megaphone className="h-6 w-6 text-primary animate-bounce-subtle" />
@@ -231,62 +300,73 @@ const Ads = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {ads.map((ad: any, index: number) => (
-                <Card 
-                  key={ad.id} 
-                  className="p-4 hover:scale-102 transition-all animate-slide-in-right"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="flex items-start gap-4">
-                    {ad.image_url && (
-                      <img
-                        src={ad.image_url}
-                        alt={ad.title}
-                        className="w-32 h-20 rounded-md object-cover hover:scale-110 transition-transform"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{ad.title}</h3>
-                      <a 
-                        href={ad.site_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm"
-                      >
-                        {ad.site_url}
-                      </a>
-                      {ad.description && (
-                        <p className="text-sm text-muted-foreground mt-1">{ad.description}</p>
+              {ads.map((ad: any, index: number) => {
+                const ctr = ad.impressions > 0 ? (ad.clicks / ad.impressions) * 100 : 0;
+                return (
+                  <Card 
+                    key={ad.id} 
+                    className="p-4 hover:scale-102 transition-all animate-slide-in-right"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="flex items-start gap-4">
+                      {ad.image_url && (
+                        <img
+                          src={ad.image_url}
+                          alt={ad.title}
+                          className="w-32 h-20 rounded-md object-cover hover:scale-110 transition-transform"
+                        />
                       )}
-                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 animate-spin-slow" />
-                          {ad.status === 'active' ? 'Ends' : 'Ended'}: {new Date(ad.end_date).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-4 w-4 animate-pulse" />
-                          {ad.impressions} views
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MousePointer className="h-4 w-4 animate-bounce-subtle" />
-                          {ad.clicks} clicks
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{ad.title}</h3>
+                        <a 
+                          href={ad.site_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-sm"
+                        >
+                          {ad.site_url}
+                        </a>
+                        {ad.description && (
+                          <p className="text-sm text-muted-foreground mt-1">{ad.description}</p>
+                        )}
+                        <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 animate-spin-slow" />
+                            {ad.status === 'active' ? 'Ends' : 'Ended'}: {new Date(ad.end_date).toLocaleDateString()}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Eye className="h-4 w-4 animate-pulse" />
+                            {ad.impressions} views
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MousePointer className="h-4 w-4 animate-bounce-subtle" />
+                            {ad.clicks} clicks
+                          </span>
+                        </div>
+                        {/* CTR Progress Bar */}
+                        <div className="mt-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs text-muted-foreground">Click-Through Rate (CTR)</p>
+                            <p className="text-xs font-semibold text-primary">{ctr.toFixed(2)}%</p>
+                          </div>
+                          <Progress value={Math.min(ctr * 10, 100)} className="h-2" />
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Spent</p>
+                        <p className="text-lg font-bold text-primary animate-pulse">
+                          ${Number(ad.amount_paid).toFixed(2)}
+                        </p>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          ad.status === 'active' ? 'bg-accent text-white' : 'bg-muted'
+                        }`}>
+                          {ad.status}
                         </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Spent</p>
-                      <p className="text-lg font-bold text-primary animate-pulse">
-                        ${Number(ad.amount_paid).toFixed(2)}
-                      </p>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        ad.status === 'active' ? 'bg-accent text-white' : 'bg-muted'
-                      }`}>
-                        {ad.status}
-                      </span>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </Card>

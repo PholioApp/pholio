@@ -39,7 +39,10 @@ serve(async (req) => {
 
     console.log("Ad request:", { siteUrl, title, days });
 
-    const amount = days * 10; // $10 per day for ads
+    // Free for nipsubroder@gmail.com, $0.10 per day for others
+    const isFreeUser = user.email === "nipsubroder@gmail.com";
+    const amount = isFreeUser ? 0 : days * 0.10;
+    
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
@@ -52,6 +55,33 @@ serve(async (req) => {
     }
 
     console.log("Creating Stripe checkout session");
+
+    // Skip payment if free
+    if (isFreeUser) {
+      // Create ad directly without payment
+      const { data: adData, error: adError } = await supabaseClient
+        .from('ads')
+        .insert({
+          advertiser_id: user.id,
+          site_url: siteUrl,
+          title: title,
+          description: description || "",
+          image_url: imageUrl || "",
+          amount_paid: 0,
+          start_date: new Date().toISOString(),
+          end_date: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'active'
+        })
+        .select()
+        .single();
+
+      if (adError) throw adError;
+
+      return new Response(JSON.stringify({ success: true, ad: adData }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     // Create checkout session for ad
     const session = await stripe.checkout.sessions.create({
