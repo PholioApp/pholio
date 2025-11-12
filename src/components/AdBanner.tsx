@@ -91,7 +91,13 @@ export const AdBanner = () => {
         )}
         
         <p className="text-xs text-primary font-medium">
-          Visit {new URL(ad.site_url).hostname}
+          Visit {(() => {
+            try {
+              return new URL(ad.site_url).hostname;
+            } catch {
+              return ad.site_url;
+            }
+          })()}
         </p>
       </div>
     </Card>
