@@ -1,17 +1,24 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation schema
+const verifyInputSchema = z.object({
+  sessionId: z.string().min(1).max(500)
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Use service role to bypass RLS for promotion creation after payment verification
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -29,19 +36,17 @@ serve(async (req) => {
       throw new Error("User not authenticated");
     }
 
-    const { sessionId } = await req.json();
-    
-    if (!sessionId) {
-      throw new Error("Session ID is required");
-    }
+    // Validate input
+    const rawInput = await req.json();
+    const input = verifyInputSchema.parse(rawInput);
 
-    console.log("Verifying session:", sessionId);
+    console.log("Verifying session:", input.sessionId);
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const session = await stripe.checkout.sessions.retrieve(input.sessionId);
 
     if (session.payment_status !== "paid") {
       throw new Error("Payment not completed");
@@ -87,8 +92,16 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error verifying promotion payment:", error);
-    const errorMessage = error instanceof Error ? error.message : "An error occurred";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Return user-friendly error without technical details
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify({ error: "Invalid input provided" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    return new Response(JSON.stringify({ error: "Payment verification failed" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

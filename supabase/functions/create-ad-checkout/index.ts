@@ -1,11 +1,25 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const adInputSchema = z.object({
+  siteUrl: z.string().url().min(1).max(2048)
+    .refine(url => url.startsWith('http://') || url.startsWith('https://'), 
+      'Only HTTP/HTTPS URLs allowed'),
+  title: z.string().min(1).max(100).trim(),
+  description: z.string().max(1000).trim().optional(),
+  imageUrl: z.string().url().max(2048).optional()
+    .refine(url => !url || url.startsWith('http://') || url.startsWith('https://'), 
+      'Only HTTP/HTTPS URLs allowed'),
+  days: z.number().int().min(1).max(365)
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -34,17 +48,15 @@ serve(async (req) => {
 
     console.log("User authenticated:", user.id);
 
-    const { siteUrl, title, description, imageUrl, days } = await req.json();
-    
-    if (!siteUrl || !title || !days) {
-      throw new Error("Site URL, title, and days are required");
-    }
+    // Validate input with zod
+    const rawInput = await req.json();
+    const input = adInputSchema.parse(rawInput);
 
-    console.log("Ad request:", { siteUrl, title, days });
+    console.log("Ad request:", { siteUrl: input.siteUrl, title: input.title, days: input.days });
 
     // Free for nipsubroder@gmail.com, $0.10 per day for others
     const isFreeUser = user.email === "nipsubroder@gmail.com";
-    const amount = isFreeUser ? 0 : days * 0.10;
+    const amount = isFreeUser ? 0 : input.days * 0.10;
     
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -61,18 +73,23 @@ serve(async (req) => {
 
     // Skip payment if free
     if (isFreeUser) {
-      // Create ad directly without payment
-      const { data: adData, error: adError } = await supabaseClient
+      // Use service role to create ad directly for free user (bypasses RLS)
+      const serviceClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      
+      const { data: adData, error: adError } = await serviceClient
         .from('ads')
         .insert({
           advertiser_id: user.id,
-          site_url: siteUrl,
-          title: title,
-          description: description || "",
-          image_url: imageUrl || "",
+          site_url: input.siteUrl,
+          title: input.title,
+          description: input.description || "",
+          image_url: input.imageUrl || "",
           amount_paid: 0,
           start_date: new Date().toISOString(),
-          end_date: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
+          end_date: new Date(Date.now() + input.days * 24 * 60 * 60 * 1000).toISOString(),
           status: 'active'
         })
         .select()
@@ -95,9 +112,9 @@ serve(async (req) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Advertise "${title}" for ${days} day${days > 1 ? 's' : ''}`,
-              description: `Promote your site: ${siteUrl}`,
-              images: imageUrl ? [imageUrl] : undefined,
+              name: `Advertise "${input.title}" for ${input.days} day${input.days > 1 ? 's' : ''}`,
+              description: `Promote your site: ${input.siteUrl}`,
+              images: input.imageUrl ? [input.imageUrl] : undefined,
             },
             unit_amount: amount * 100, // Convert to cents
           },
@@ -110,11 +127,11 @@ serve(async (req) => {
       metadata: {
         type: "ad",
         advertiser_id: user.id,
-        site_url: siteUrl,
-        title: title,
-        description: description || "",
-        image_url: imageUrl || "",
-        days: days.toString(),
+        site_url: input.siteUrl,
+        title: input.title,
+        description: input.description || "",
+        image_url: input.imageUrl || "",
+        days: input.days.toString(),
         amount: amount.toString(),
       },
     });
@@ -127,8 +144,16 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error creating ad checkout:", error);
-    const errorMessage = error instanceof Error ? error.message : "An error occurred";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Return user-friendly error without technical details
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify({ error: "Invalid input provided" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    return new Response(JSON.stringify({ error: "An error occurred while processing your request" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

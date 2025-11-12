@@ -1,11 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const promotionInputSchema = z.object({
+  imageId: z.string().uuid(),
+  days: z.number().int().min(1).max(365)
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,19 +38,17 @@ serve(async (req) => {
 
     console.log("User authenticated:", user.id);
 
-    const { imageId, days } = await req.json();
-    
-    if (!imageId || !days) {
-      throw new Error("Image ID and days are required");
-    }
+    // Validate input
+    const rawInput = await req.json();
+    const input = promotionInputSchema.parse(rawInput);
 
-    console.log("Promotion request:", { imageId, days });
+    console.log("Promotion request:", { imageId: input.imageId, days: input.days });
 
     // Get image details
     const { data: image, error: imageError } = await supabaseClient
       .from("images")
       .select("*")
-      .eq("id", imageId)
+      .eq("id", input.imageId)
       .single();
 
     if (imageError || !image) {
@@ -57,7 +62,7 @@ serve(async (req) => {
 
     console.log("Image verified:", image.title);
 
-    const amount = days * 5; // $5 per day
+    const amount = input.days * 5; // $5 per day
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
@@ -80,7 +85,7 @@ serve(async (req) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Promote "${image.title}" for ${days} day${days > 1 ? 's' : ''}`,
+              name: `Promote "${image.title}" for ${input.days} day${input.days > 1 ? 's' : ''}`,
               description: `Boost visibility and reach more buyers`,
               images: image.thumbnail_url ? [image.thumbnail_url] : undefined,
             },
@@ -94,9 +99,9 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/promotions`,
       metadata: {
         type: "promotion",
-        image_id: imageId,
+        image_id: input.imageId,
         seller_id: user.id,
-        days: days.toString(),
+        days: input.days.toString(),
         amount: amount.toString(),
       },
     });
@@ -109,8 +114,16 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error creating promotion checkout:", error);
-    const errorMessage = error instanceof Error ? error.message : "An error occurred";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Return user-friendly error without technical details
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify({ error: "Invalid input provided" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    return new Response(JSON.stringify({ error: "An error occurred while processing your request" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

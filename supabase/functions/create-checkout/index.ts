@@ -1,11 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const checkoutInputSchema = z.object({
+  imageId: z.string().uuid(),
+  price: z.number().positive().max(10000).optional()
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -27,17 +34,15 @@ serve(async (req) => {
       throw new Error("User not authenticated");
     }
 
-    const { imageId } = await req.json();
+    // Validate input
+    const rawInput = await req.json();
+    const input = checkoutInputSchema.parse(rawInput);
     
-    if (!imageId) {
-      throw new Error("Image ID is required");
-    }
-
     // Get image details
     const { data: image, error: imageError } = await supabaseClient
       .from("images")
       .select("*")
-      .eq("id", imageId)
+      .eq("id", input.imageId)
       .single();
 
     if (imageError || !image) {
@@ -49,7 +54,7 @@ serve(async (req) => {
       .from("purchases")
       .select("id")
       .eq("buyer_id", user.id)
-      .eq("image_id", imageId)
+      .eq("image_id", input.imageId)
       .maybeSingle();
 
     if (existingPurchase) {
@@ -86,10 +91,10 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}&image_id=${imageId}`,
+      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}&image_id=${input.imageId}`,
       cancel_url: `${req.headers.get("origin")}/`,
       metadata: {
-        image_id: imageId,
+        image_id: input.imageId,
         buyer_id: user.id,
         amount: image.price,
       },
@@ -103,8 +108,16 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error creating checkout session:", error);
-    const errorMessage = error instanceof Error ? error.message : "An error occurred";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Return user-friendly error without technical details
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify({ error: "Invalid input provided" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    return new Response(JSON.stringify({ error: "An error occurred while processing your request" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

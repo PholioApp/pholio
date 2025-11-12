@@ -87,26 +87,26 @@ const Liked = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.from("purchases").insert({
-        buyer_id: user.id,
-        image_id: imageId,
-        amount: price,
-        status: "completed",
+      // Create Stripe checkout session instead of direct purchase insert
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { imageId, price },
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Purchase successful!",
-        description: "The image has been added to your collection.",
-      });
-      
-      navigate("/purchases");
+      if (data?.url) {
+        // Open Stripe checkout in new tab
+        window.open(data.url, "_blank");
+        toast({
+          title: "Redirecting to checkout",
+          description: "Complete your purchase in the new tab.",
+        });
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to start checkout process",
       });
     }
   };
