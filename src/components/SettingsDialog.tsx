@@ -119,7 +119,7 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
             Settings
           </DialogTitle>
           <DialogDescription className="animate-fade-in">
-            Customize your SwipeSnap experience
+            Customize your Pholio experience
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">{/* Audio Settings */}
@@ -272,7 +272,7 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
                   <Crown className="h-6 w-6 text-primary animate-bounce" />
                 </div>
                 <div className="flex-1 space-y-0.5">
-                  <Label className="text-lg font-bold">SwipeSnap Premium</Label>
+                  <Label className="text-lg font-bold">Pholio Premium</Label>
                   <p className="text-xs text-muted-foreground">
                     €1/month - Unlock exclusive features
                   </p>
@@ -386,7 +386,7 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
           {/* App Info */}
           <div className="pt-4 border-t text-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <p className="text-xs text-muted-foreground animate-pulse">
-              SwipeSnap v1.0 • Made with 💜
+              Pholio v1.0 • Made with 💜
             </p>
           </div>
         </div>

@@ -89,7 +89,7 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
     e.stopPropagation();
     const shareData = {
       title: image.title,
-      text: `Check out "${image.title}" by @${image.seller.username} on SwipeSnap!`,
+      text: `Check out "${image.title}" by @${image.seller.username} on Pholio!`,
       url: window.location.origin,
     };
 

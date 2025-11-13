@@ -29,12 +29,8 @@ const Search = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-      } else {
-        setUser(user);
-        loadAvailableTags();
-      }
+      setUser(user);
+      loadAvailableTags();
     };
     checkAuth();
   }, [navigate]);
