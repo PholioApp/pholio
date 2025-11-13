@@ -46,21 +46,20 @@ const Index = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-      } else {
-        setUser(user);
+      setUser(user);
+      if (user) {
         fetchImages(user.id);
+      } else {
+        fetchImages(null);
       }
     };
 
     checkAuth();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
-        setUser(session.user);
+      setUser(session?.user || null);
+      if (session?.user) {
+        fetchImages(session.user.id);
       }
     });
 
@@ -69,19 +68,24 @@ const Index = () => {
     };
   }, [navigate]);
 
-  const fetchImages = async (userId: string) => {
+  const fetchImages = async (userId: string | null) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("images")
         .select(`
           *,
           seller:profiles!images_seller_id_fkey(username, avatar_url)
         `)
         .eq("status", "active")
-        .neq("seller_id", userId)
         .order("created_at", { ascending: false })
         .limit(20);
+
+      if (userId) {
+        query = query.neq("seller_id", userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setImages(data || []);
@@ -156,7 +160,21 @@ const Index = () => {
 
   const handleSwipeRight = async () => {
     const currentImage = images[currentIndex];
-    if (!currentImage || !user) return;
+    if (!currentImage) return;
+
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like photos",
+        action: (
+          <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+            Sign in
+          </Button>
+        ),
+      });
+      setCurrentIndex((prev) => prev + 1);
+      return;
+    }
 
     // Play like sound
     soundManager.play('like');
@@ -200,7 +218,20 @@ const Index = () => {
 
   const handleBuy = async () => {
     const currentImage = images[currentIndex];
-    if (!currentImage || !user) return;
+    if (!currentImage) return;
+
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to purchase photos",
+        action: (
+          <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+            Sign in
+          </Button>
+        ),
+      });
+      return;
+    }
 
     // Play purchase sound
     soundManager.play('purchase');
@@ -413,6 +444,18 @@ const Index = () => {
               size="icon"
               onClick={() => {
                 soundManager.play('click');
+                if (!user) {
+                  toast({
+                    title: "Sign in required",
+                    description: "Please sign in to view followed creators",
+                    action: (
+                      <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+                        Sign in
+                      </Button>
+                    ),
+                  });
+                  return;
+                }
                 navigate("/following");
               }}
               className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
@@ -425,6 +468,18 @@ const Index = () => {
               size="icon"
               onClick={() => {
                 soundManager.play('click');
+                if (!user) {
+                  toast({
+                    title: "Sign in required",
+                    description: "Please sign in to view your favorites",
+                    action: (
+                      <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+                        Sign in
+                      </Button>
+                    ),
+                  });
+                  return;
+                }
                 navigate("/liked");
               }}
               className="h-12 w-12 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
@@ -437,6 +492,18 @@ const Index = () => {
               size="icon"
               onClick={() => {
                 soundManager.play('click');
+                if (!user) {
+                  toast({
+                    title: "Sign in required",
+                    description: "Please sign in to upload photos",
+                    action: (
+                      <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+                        Sign in
+                      </Button>
+                    ),
+                  });
+                  return;
+                }
                 navigate("/upload");
               }}
               className="h-12 w-12 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
@@ -449,6 +516,18 @@ const Index = () => {
               size="icon"
               onClick={() => {
                 soundManager.play('click');
+                if (!user) {
+                  toast({
+                    title: "Sign in required",
+                    description: "Please sign in to view your purchases",
+                    action: (
+                      <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+                        Sign in
+                      </Button>
+                    ),
+                  });
+                  return;
+                }
                 navigate("/purchases");
               }}
               className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
@@ -473,6 +552,18 @@ const Index = () => {
               size="icon"
               onClick={() => {
                 soundManager.play('click');
+                if (!user) {
+                  toast({
+                    title: "Sign in required",
+                    description: "Please sign in to view your profile",
+                    action: (
+                      <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+                        Sign in
+                      </Button>
+                    ),
+                  });
+                  return;
+                }
                 navigate("/profile");
               }}
               className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
