@@ -381,7 +381,7 @@ const Index = () => {
       </div>
 
       {/* Bottom Navigation Bar - Compact */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl z-50 animate-slide-up">
         <div className="max-w-7xl mx-auto px-2 py-2">
           <div className="flex items-center justify-around">
             <Button
@@ -391,10 +391,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/trending");
               }}
-              className="h-12 w-12 hover:bg-primary/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Trending"
             >
-              <TrendingUp size={22} />
+              <TrendingUp size={22} className="transition-transform duration-300 hover:rotate-12" />
             </Button>
             <Button
               variant="ghost"
@@ -403,10 +403,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/challenges");
               }}
-              className="h-12 w-12 hover:bg-primary/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Challenges"
             >
-              <Trophy size={22} />
+              <Trophy size={22} className="transition-transform duration-300 hover:rotate-12" />
             </Button>
             <Button
               variant="ghost"
@@ -415,10 +415,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/following");
               }}
-              className="h-12 w-12 hover:bg-primary/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Following"
             >
-              <UserPlus size={22} />
+              <UserPlus size={22} className="transition-transform duration-300 hover:rotate-12" />
             </Button>
             <Button
               variant="ghost"
@@ -427,10 +427,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/liked");
               }}
-              className="h-12 w-12 hover:bg-primary/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Favorites"
             >
-              <Heart size={22} />
+              <Heart size={22} className="transition-transform duration-300 hover:scale-125" />
             </Button>
             <Button
               variant="ghost"
@@ -439,10 +439,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/upload");
               }}
-              className="h-12 w-12 hover:bg-accent/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Upload"
             >
-              <Upload size={22} />
+              <Upload size={22} className="transition-transform duration-300 hover:-translate-y-1" />
             </Button>
             <Button
               variant="ghost"
@@ -451,10 +451,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/purchases");
               }}
-              className="h-12 w-12 hover:bg-accent/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Purchases"
             >
-              <ShoppingBag size={22} />
+              <ShoppingBag size={22} className="transition-transform duration-300 hover:rotate-12" />
             </Button>
             <Button
               variant="ghost"
@@ -463,10 +463,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/leaderboard");
               }}
-              className="h-12 w-12 hover:bg-accent/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Leaders"
             >
-              <Users size={22} />
+              <Users size={22} className="transition-transform duration-300 hover:scale-110" />
             </Button>
             <Button
               variant="ghost"
@@ -475,10 +475,10 @@ const Index = () => {
                 soundManager.play('click');
                 navigate("/profile");
               }}
-              className="h-12 w-12 hover:bg-accent/10 transition-all hover:scale-110"
+              className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
               title="Profile"
             >
-              <User size={22} />
+              <User size={22} className="transition-transform duration-300 hover:rotate-12" />
             </Button>
             <SettingsDialog />
           </div>

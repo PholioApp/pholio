@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Trophy, Lock } from "lucide-react";
@@ -100,6 +100,9 @@ export const AchievementsDialog = () => {
             <Trophy className="text-primary" />
             Achievements ({unlockedCount}/{totalCount})
           </DialogTitle>
+          <DialogDescription>
+            Track your progress and unlock special badges
+          </DialogDescription>
           <div className="w-full bg-secondary rounded-full h-2 mt-2">
             <div
               className="bg-gradient-primary h-2 rounded-full transition-all duration-500"
