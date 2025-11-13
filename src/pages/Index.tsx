@@ -123,8 +123,8 @@ const Index = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: "SwipeSnap - Discover & Buy Amazing Photos",
-      text: "Check out SwipeSnap! Discover and purchase stunning photography with a simple swipe.",
+      title: "Pholio - Discover & Buy Amazing Photos",
+      text: "Check out Pholio! Discover and purchase stunning photography with a simple swipe.",
       url: window.location.origin,
     };
 
@@ -315,7 +315,7 @@ const Index = () => {
             }}
             title="Click me multiple times... 👀"
           >
-            SwipeSnap
+            Pholio
           </h1>
           
           {/* Quick Search Bar */}

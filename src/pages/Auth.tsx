@@ -268,7 +268,7 @@ const Auth = () => {
                 
                 toast({
                   title: "Welcome back!",
-                  description: "Your ban has expired. Welcome back to SwipeSnap!",
+                  description: "Your ban has expired. Welcome back to Pholio!",
                 });
                 navigate("/");
                 return;
@@ -324,7 +324,7 @@ const Auth = () => {
 
         toast({
           title: "Account created!",
-          description: "Welcome to SwipeSnap.",
+          description: "Welcome to Pholio.",
         });
         navigate("/");
       }
@@ -361,7 +361,7 @@ const Auth = () => {
           </div>
           
           <h1 className="text-5xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
-            SwipeSnap
+            Pholio
           </h1>
           
           <p className="text-muted-foreground mb-4 text-lg">
