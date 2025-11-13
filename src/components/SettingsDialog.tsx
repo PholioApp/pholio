@@ -18,16 +18,16 @@ import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { Badge } from "@/components/ui/badge";
 
 const COLOR_THEMES = [
-  { name: "Purple Dream", primary: "270 91% 65%", accent: "280 89% 60%", icon: "💜", premium: false },
-  { name: "Ocean Blue", primary: "210 100% 50%", accent: "200 98% 60%", icon: "🌊", premium: false },
-  { name: "Sunset Orange", primary: "25 95% 55%", accent: "15 90% 60%", icon: "🌅", premium: false },
-  { name: "Forest Green", primary: "140 70% 45%", accent: "160 75% 50%", icon: "🌲", premium: false },
-  { name: "Rose Pink", primary: "340 82% 62%", accent: "350 85% 70%", icon: "🌹", premium: false },
-  { name: "Golden Sun", primary: "45 93% 58%", accent: "40 96% 65%", icon: "☀️", premium: false },
-  { name: "Glass Morphism", primary: "220 100% 70%", accent: "240 100% 80%", icon: "✨", premium: true },
-  { name: "Neon Cyber", primary: "310 100% 60%", accent: "170 100% 50%", icon: "🌐", premium: true },
-  { name: "Royal Gold", primary: "45 100% 50%", accent: "30 100% 45%", icon: "👑", premium: true },
-  { name: "Aurora Borealis", primary: "160 90% 50%", accent: "280 90% 60%", icon: "🌌", premium: true },
+  { name: "Purple Dream", primary: "270 91% 65%", accent: "280 89% 60%", icon: "💜", premium: false, className: "" },
+  { name: "Ocean Blue", primary: "210 100% 50%", accent: "200 98% 60%", icon: "🌊", premium: false, className: "" },
+  { name: "Sunset Orange", primary: "25 95% 55%", accent: "15 90% 60%", icon: "🌅", premium: false, className: "" },
+  { name: "Forest Green", primary: "140 70% 45%", accent: "160 75% 50%", icon: "🌲", premium: false, className: "" },
+  { name: "Rose Pink", primary: "340 82% 62%", accent: "350 85% 70%", icon: "🌹", premium: false, className: "" },
+  { name: "Golden Sun", primary: "45 93% 58%", accent: "40 96% 65%", icon: "☀️", premium: false, className: "" },
+  { name: "Glass Morphism", primary: "220 100% 70%", accent: "240 100% 80%", icon: "✨", premium: true, className: "glass-premium animate-glass-shimmer" },
+  { name: "Neon Cyber", primary: "310 100% 60%", accent: "170 100% 50%", icon: "🌐", premium: true, className: "neon-effect animate-neon-pulse" },
+  { name: "Royal Gold", primary: "45 100% 50%", accent: "30 100% 45%", icon: "👑", premium: true, className: "animate-glow" },
+  { name: "Aurora Borealis", primary: "160 90% 50%", accent: "280 90% 60%", icon: "🌌", premium: true, className: "animate-shimmer" },
 ];
 
 export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactNode }) => {
@@ -64,6 +64,17 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
     const root = document.documentElement;
     root.style.setProperty('--primary', selectedTheme.primary);
     root.style.setProperty('--accent', selectedTheme.accent);
+    
+    // Apply special classes for premium themes
+    const body = document.body;
+    // Remove all theme classes first
+    body.classList.remove('glass-premium', 'animate-glass-shimmer', 'neon-effect', 'animate-neon-pulse', 'animate-glow', 'animate-shimmer');
+    
+    // Add the theme's special classes if it has any
+    if (selectedTheme.className) {
+      const classes = selectedTheme.className.split(' ');
+      body.classList.add(...classes);
+    }
   };
 
   const handleColorThemeChange = (index: number) => {
@@ -234,7 +245,9 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
                   size="sm"
                   onClick={() => handleColorThemeChange(index)}
                   disabled={ct.premium && !isPremium}
-                  className="transition-all hover:scale-105 active:scale-95 text-xs relative"
+                  className={`transition-all hover:scale-105 active:scale-95 text-xs relative ${
+                    colorTheme === index && ct.className ? ct.className : ''
+                  }`}
                 >
                   {ct.premium && !isPremium && (
                     <Lock className="h-3 w-3 absolute top-1 right-1" />
@@ -281,6 +294,18 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
                 <div className="flex items-center gap-2 text-sm">
                   <Sparkles className="h-4 w-4 text-primary" />
                   <span>Ad-Free Experience</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Zap className="h-4 w-4 text-primary" />
+                  <span>Early Access to New Features</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span>Enhanced Profile Customization</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Crown className="h-4 w-4 text-primary" />
+                  <span>Exclusive Premium Animations</span>
                 </div>
               </div>
               <Button 

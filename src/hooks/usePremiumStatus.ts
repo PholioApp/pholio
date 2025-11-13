@@ -61,6 +61,25 @@ export const usePremiumStatus = () => {
 
   const openCustomerPortal = async () => {
     try {
+      // Check if user is admin (admin gets free premium, no Stripe customer)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: adminRole } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+
+        if (adminRole) {
+          toast({
+            title: "Premium Admin Access",
+            description: "You have free premium access as an admin!",
+          });
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('customer-portal');
       
       if (error) throw error;
