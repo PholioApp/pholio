@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, TrendingUp, Eye, Heart, DollarSign, User, Upload, LogOut, Settings as SettingsIcon, Megaphone, Image as ImageIcon, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Camera, TrendingUp, Eye, Heart, DollarSign, User, Upload, LogOut, Settings as SettingsIcon, Megaphone, Image as ImageIcon, ShoppingBag, Crown } from "lucide-react";
 import { SettingsDialog } from "@/components/SettingsDialog";
+import { Badge } from "@/components/ui/badge";
+import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
@@ -19,6 +21,7 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isPremium, loading: premiumLoading } = usePremiumStatus();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -220,7 +223,15 @@ const Profile = () => {
               />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">@{profile.username}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold">@{profile.username}</h1>
+                {isPremium && !premiumLoading && (
+                  <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black border-0 animate-glow">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Premium
+                  </Badge>
+                )}
+              </div>
               <p className="text-muted-foreground">{profile.email}</p>
               <div className="flex gap-4 mt-2 text-sm">
                 <button

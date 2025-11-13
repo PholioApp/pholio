@@ -42,9 +42,15 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(282 83% 58%));
     --gradient-accent: linear-gradient(135deg, hsl(142 71% 45%), hsl(162 71% 45%));
     --gradient-card: linear-gradient(180deg, hsl(240 5% 96%), hsl(0 0% 100%));
+    --gradient-neon: linear-gradient(135deg, hsl(310 100% 60%), hsl(170 100% 50%));
+    --gradient-glass: linear-gradient(135deg, hsla(220 100% 70% / 0.1), hsla(240 100% 80% / 0.1));
+    --gradient-gold: linear-gradient(135deg, hsl(45 100% 50%), hsl(30 100% 45%));
+    --gradient-aurora: linear-gradient(135deg, hsl(160 90% 50%), hsl(280 90% 60%));
     
     --shadow-glow: 0 0 40px hsl(262 83% 58% / 0.3);
     --shadow-card: 0 8px 32px hsl(240 10% 3.9% / 0.1);
+    --shadow-neon: 0 0 60px hsl(310 100% 60% / 0.8), 0 0 100px hsl(170 100% 50% / 0.5);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -167,6 +173,26 @@ All colors MUST be HSL.
     100% { filter: blur(0); opacity: 1; }
   }
 
+  @keyframes neon-pulse {
+    0%, 100% { 
+      text-shadow: 0 0 10px hsl(310 100% 60%), 0 0 20px hsl(310 100% 60%), 0 0 30px hsl(170 100% 50%);
+      box-shadow: 0 0 20px hsl(310 100% 60% / 0.5), 0 0 40px hsl(170 100% 50% / 0.3);
+    }
+    50% { 
+      text-shadow: 0 0 20px hsl(310 100% 60%), 0 0 40px hsl(310 100% 60%), 0 0 60px hsl(170 100% 50%);
+      box-shadow: 0 0 40px hsl(310 100% 60% / 0.8), 0 0 80px hsl(170 100% 50% / 0.6);
+    }
+  }
+
+  @keyframes glass-shimmer {
+    0% { 
+      background-position: -200% center;
+    }
+    100% { 
+      background-position: 200% center;
+    }
+  }
+
   .animate-float {
     animation: float 10s ease-in-out infinite;
   }
@@ -231,6 +257,14 @@ All colors MUST be HSL.
     animation: blur-in 0.5s ease-out;
   }
 
+  .animate-neon-pulse {
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-glass-shimmer {
+    animation: glass-shimmer 3s linear infinite;
+  }
+
   .hover-scale:hover {
     transform: scale(1.05);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -260,6 +294,21 @@ All colors MUST be HSL.
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-premium {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 255, 255, 0.05) 50%, 
+      rgba(255, 255, 255, 0.1) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  .neon-effect {
+    text-shadow: 0 0 10px hsl(310 100% 60%), 0 0 20px hsl(310 100% 60%), 0 0 30px hsl(170 100% 50%);
+    box-shadow: 0 0 20px hsl(310 100% 60% / 0.5), 0 0 40px hsl(170 100% 50% / 0.3), inset 0 0 20px hsl(310 100% 60% / 0.2);
   }
 
   .hover-lift:hover {
