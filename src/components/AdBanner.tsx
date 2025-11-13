@@ -3,10 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 
 export const AdBanner = () => {
   const [ad, setAd] = useState<any>(null);
   const [dismissed, setDismissed] = useState(false);
+  const { isPremium } = usePremiumStatus();
 
   useEffect(() => {
     const fetchAd = async () => {
@@ -56,7 +58,7 @@ export const AdBanner = () => {
     }
   };
 
-  if (!ad || dismissed) return null;
+  if (!ad || dismissed || isPremium) return null;
 
   return (
     <Card className="p-4 bg-gradient-card border-primary/20 relative animate-fade-in hover:shadow-glow transition-all duration-300 hover:scale-[1.02] hover:border-primary/40">
