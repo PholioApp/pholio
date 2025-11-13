@@ -13,6 +13,7 @@ import Liked from "./pages/Liked";
 import Following from "./pages/Following";
 import Search from "./pages/Search";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import PremiumSuccess from "./pages/PremiumSuccess";
 import Admin from "./pages/Admin";
 import SellerDashboard from "./pages/SellerDashboard";
 import Challenges from "./pages/Challenges";
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/following" element={<Following />} />
           <Route path="/search" element={<Search />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/premium-success" element={<PremiumSuccess />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
           <Route path="/challenges" element={<Challenges />} />

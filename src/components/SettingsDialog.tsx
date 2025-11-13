@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Music, Moon, Sun, Bell, Globe, Shield, Palette, Zap, Sparkles } from "lucide-react";
+import { Music, Moon, Sun, Bell, Globe, Shield, Palette, Zap, Sparkles, Crown, Lock } from "lucide-react";
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -14,14 +14,20 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { soundManager } from "@/lib/sounds";
+import { usePremiumStatus } from "@/hooks/usePremiumStatus";
+import { Badge } from "@/components/ui/badge";
 
 const COLOR_THEMES = [
-  { name: "Purple Dream", primary: "270 91% 65%", accent: "280 89% 60%", icon: "💜" },
-  { name: "Ocean Blue", primary: "210 100% 50%", accent: "200 98% 60%", icon: "🌊" },
-  { name: "Sunset Orange", primary: "25 95% 55%", accent: "15 90% 60%", icon: "🌅" },
-  { name: "Forest Green", primary: "140 70% 45%", accent: "160 75% 50%", icon: "🌲" },
-  { name: "Rose Pink", primary: "340 82% 62%", accent: "350 85% 70%", icon: "🌹" },
-  { name: "Golden Sun", primary: "45 93% 58%", accent: "40 96% 65%", icon: "☀️" },
+  { name: "Purple Dream", primary: "270 91% 65%", accent: "280 89% 60%", icon: "💜", premium: false },
+  { name: "Ocean Blue", primary: "210 100% 50%", accent: "200 98% 60%", icon: "🌊", premium: false },
+  { name: "Sunset Orange", primary: "25 95% 55%", accent: "15 90% 60%", icon: "🌅", premium: false },
+  { name: "Forest Green", primary: "140 70% 45%", accent: "160 75% 50%", icon: "🌲", premium: false },
+  { name: "Rose Pink", primary: "340 82% 62%", accent: "350 85% 70%", icon: "🌹", premium: false },
+  { name: "Golden Sun", primary: "45 93% 58%", accent: "40 96% 65%", icon: "☀️", premium: false },
+  { name: "Glass Morphism", primary: "220 100% 70%", accent: "240 100% 80%", icon: "✨", premium: true },
+  { name: "Neon Cyber", primary: "310 100% 60%", accent: "170 100% 50%", icon: "🌐", premium: true },
+  { name: "Royal Gold", primary: "45 100% 50%", accent: "30 100% 45%", icon: "👑", premium: true },
+  { name: "Aurora Borealis", primary: "160 90% 50%", accent: "280 90% 60%", icon: "🌌", premium: true },
 ];
 
 export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactNode }) => {
@@ -32,6 +38,7 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
   const [privacy, setPrivacy] = useState("public");
   const [colorTheme, setColorTheme] = useState(0);
   const { theme, setTheme } = useTheme();
+  const { isPremium, loading, startCheckout, openCustomerPortal } = usePremiumStatus();
 
   useEffect(() => {
     // Load settings from localStorage
@@ -60,6 +67,10 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
   };
 
   const handleColorThemeChange = (index: number) => {
+    const selectedTheme = COLOR_THEMES[index];
+    if (selectedTheme.premium && !isPremium) {
+      return; // Don't allow non-premium users to select premium themes
+    }
     setColorTheme(index);
     applyColorTheme(index);
     localStorage.setItem("colorTheme", String(index));
@@ -208,6 +219,12 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
                   {COLOR_THEMES[colorTheme].icon} {COLOR_THEMES[colorTheme].name}
                 </p>
               </div>
+              {isPremium && (
+                <Badge className="bg-gradient-primary animate-glow">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Premium
+                </Badge>
+              )}
             </div>
             <div className="grid grid-cols-3 gap-2">
               {COLOR_THEMES.map((ct, index) => (
@@ -216,14 +233,89 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
                   variant={colorTheme === index ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleColorThemeChange(index)}
-                  className="transition-all hover:scale-105 active:scale-95 text-xs"
+                  disabled={ct.premium && !isPremium}
+                  className="transition-all hover:scale-105 active:scale-95 text-xs relative"
                 >
+                  {ct.premium && !isPremium && (
+                    <Lock className="h-3 w-3 absolute top-1 right-1" />
+                  )}
                   <span className="mr-1">{ct.icon}</span>
                   {ct.name.split(' ')[0]}
                 </Button>
               ))}
             </div>
+            {!isPremium && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                🔒 Unlock 4 premium themes with Premium subscription
+              </p>
+            )}
           </div>
+
+          {/* Premium Section */}
+          {!isPremium && (
+            <div className="py-4 px-4 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg border-2 border-primary/50 animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.25s" }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Crown className="h-6 w-6 text-primary animate-bounce" />
+                </div>
+                <div className="flex-1 space-y-0.5">
+                  <Label className="text-lg font-bold">SwipeSnap Premium</Label>
+                  <p className="text-xs text-muted-foreground">
+                    €1/month - Unlock exclusive features
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span>4 Exclusive Premium Themes</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Zap className="h-4 w-4 text-primary" />
+                  <span>Priority Support</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Crown className="h-4 w-4 text-primary" />
+                  <span>Premium Badge on Profile</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span>Ad-Free Experience</span>
+                </div>
+              </div>
+              <Button 
+                onClick={startCheckout}
+                className="w-full bg-gradient-primary hover:opacity-90 transition-all hover:scale-105 active:scale-95"
+                disabled={loading}
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                Upgrade to Premium
+              </Button>
+            </div>
+          )}
+
+          {isPremium && (
+            <div className="py-4 px-4 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg border-2 border-primary/50 animate-slide-in-left" style={{ animationDelay: "0.25s" }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Crown className="h-6 w-6 text-primary animate-glow" />
+                </div>
+                <div className="flex-1 space-y-0.5">
+                  <Label className="text-lg font-bold">Premium Active</Label>
+                  <p className="text-xs text-muted-foreground">
+                    You're enjoying all premium features!
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={openCustomerPortal}
+                variant="outline"
+                className="w-full transition-all hover:scale-105 active:scale-95"
+              >
+                Manage Subscription
+              </Button>
+            </div>
+          )}
 
           {/* Privacy */}
           <div className="py-3 px-3 bg-gradient-card rounded-lg border border-border animate-slide-in-left hover:scale-[1.02] transition-all" style={{ animationDelay: "0.25s" }}>
