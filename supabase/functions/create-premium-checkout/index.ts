@@ -43,8 +43,8 @@ serve(async (req) => {
       logStep("No existing customer, will create in checkout");
     }
 
-    // Premium price ID - this will need to be created in Stripe dashboard
-    const priceId = "price_premium_monthly"; // Replace with actual Stripe price ID
+    // Premium price ID
+    const priceId = "price_1ST2tuLt2uvRKxFjoSLNalhK";
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
