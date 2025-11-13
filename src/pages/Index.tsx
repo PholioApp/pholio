@@ -258,9 +258,9 @@ const Index = () => {
 
       <div className="max-w-md mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 pt-4 animate-fade-in">
+        <div className="flex items-center justify-center mb-6 pt-4 animate-fade-in">
           <h1 
-            className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
+            className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
             onClick={() => {
               setLogoClicks(prev => prev + 1);
               if (logoClicks + 1 === 5) {
@@ -286,130 +286,6 @@ const Index = () => {
           >
             SwipeSnap
           </h1>
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                handleShare();
-              }}
-              title="Share App"
-              className="bg-gradient-primary hover:opacity-90 transition-all hover:scale-110 active:scale-95"
-            >
-              <Share2 size={20} />
-            </Button>
-            <AchievementsDialog />
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/challenges");
-              }}
-              title="Challenges"
-              className="transition-all hover:scale-110 active:scale-95 hover:rotate-12 animate-bounce-in"
-            >
-              <Trophy size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/leaderboard");
-              }}
-              title="Leaderboard"
-              className="transition-all hover:scale-110 active:scale-95 animate-pulse-slow animate-glow"
-            >
-              <Users size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/trending");
-              }}
-              title="Trending"
-              className="transition-all hover:scale-110 active:scale-95 hover:text-accent animate-hover-float"
-            >
-              <TrendingUp size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/search");
-              }}
-              title="Search"
-              className="transition-all hover:scale-110 active:scale-95 hover-rotate"
-            >
-              <Search size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/following");
-              }}
-              title="Following"
-              className="transition-all hover:scale-110 active:scale-95"
-            >
-              <UserPlus size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/liked");
-              }}
-              title="Favorites"
-              className="transition-all hover:scale-110 active:scale-95 hover:text-red-400"
-            >
-              <Heart size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/purchases");
-              }}
-              title="Purchases"
-              className="transition-all hover:scale-110 active:scale-95"
-            >
-              <ShoppingBag size={20} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/upload");
-              }}
-              title="Upload"
-              className="transition-all hover:scale-110 active:scale-95 hover:rotate-180"
-            >
-              <Upload size={20} />
-            </Button>
-            <SettingsDialog />
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                soundManager.play('click');
-                navigate("/profile");
-              }}
-              title="Profile"
-              className="transition-all hover:scale-110 active:scale-95"
-            >
-              <User size={20} />
-            </Button>
-          </div>
         </div>
 
         {/* Platform Stats */}
@@ -479,12 +355,153 @@ const Index = () => {
         </div>
 
         {/* Stats */}
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground mb-24">
           {images.length > 0 && currentIndex < images.length && (
             <p>
               {currentIndex + 1} / {images.length} images
             </p>
           )}
+        </div>
+      </div>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border shadow-2xl z-50 animate-slide-up">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          {/* Primary Navigation Row */}
+          <div className="flex items-center justify-around gap-2 mb-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/search");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/10 transition-all hover:scale-110 group"
+            >
+              <Search size={20} className="mb-1 group-hover:text-primary transition-colors" />
+              <span className="text-xs">Search</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/trending");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/10 transition-all hover:scale-110 group"
+            >
+              <TrendingUp size={20} className="mb-1 group-hover:text-primary transition-colors" />
+              <span className="text-xs">Trending</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/challenges");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/10 transition-all hover:scale-110 group"
+            >
+              <Trophy size={20} className="mb-1 group-hover:text-primary transition-colors" />
+              <span className="text-xs">Challenges</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/following");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/10 transition-all hover:scale-110 group"
+            >
+              <UserPlus size={20} className="mb-1 group-hover:text-primary transition-colors" />
+              <span className="text-xs">Following</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/liked");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/10 transition-all hover:scale-110 group"
+            >
+              <Heart size={20} className="mb-1 group-hover:text-primary transition-colors" />
+              <span className="text-xs">Liked</span>
+            </Button>
+          </div>
+
+          {/* Secondary Navigation Row */}
+          <div className="flex items-center justify-around gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/upload");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-accent/10 transition-all hover:scale-110 group"
+            >
+              <Upload size={20} className="mb-1 group-hover:text-accent transition-colors" />
+              <span className="text-xs">Upload</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/purchases");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-accent/10 transition-all hover:scale-110 group"
+            >
+              <ShoppingBag size={20} className="mb-1 group-hover:text-accent transition-colors" />
+              <span className="text-xs">Purchases</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/leaderboard");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-accent/10 transition-all hover:scale-110 group"
+            >
+              <Users size={20} className="mb-1 group-hover:text-accent transition-colors" />
+              <span className="text-xs">Leaders</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                navigate("/profile");
+              }}
+              className="flex-col h-auto py-2 px-3 hover:bg-accent/10 transition-all hover:scale-110 group"
+            >
+              <User size={20} className="mb-1 group-hover:text-accent transition-colors" />
+              <span className="text-xs">Profile</span>
+            </Button>
+            <div className="flex-col h-auto py-2 px-3">
+              <SettingsDialog />
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex items-center justify-center gap-3 mt-3 pt-3 border-t border-border/50">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                soundManager.play('click');
+                handleShare();
+              }}
+              className="hover:bg-gradient-primary hover:text-white transition-all hover:scale-105"
+            >
+              <Share2 size={16} className="mr-2" />
+              Share
+            </Button>
+            <AchievementsDialog />
+          </div>
         </div>
       </div>
     </div>
