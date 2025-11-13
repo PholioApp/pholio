@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Trophy, Calendar, ThumbsUp, Upload, Award } from "lucide-react";
@@ -272,6 +272,9 @@ const Challenges = () => {
                 <Trophy className="text-primary" />
                 {selectedChallenge?.title}
               </DialogTitle>
+              <DialogDescription>
+                View all submissions for this challenge
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6">
