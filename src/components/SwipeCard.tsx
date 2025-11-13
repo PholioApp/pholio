@@ -33,9 +33,12 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
   const [likeCount, setLikeCount] = useState(0);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [lastTap, setLastTap] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
+  const scale = useTransform(x, [-200, 0, 200], [0.8, 1, 0.8]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -67,6 +70,19 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
         onSwipeLeft();
       }
     }
+  };
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+    if (now - lastTap < DOUBLE_TAP_DELAY) {
+      onSwipeRight();
+      toast({
+        title: "❤️ Added to favorites!",
+        description: "Double-tap again anytime to like",
+      });
+    }
+    setLastTap(now);
   };
 
   const handleShareImage = async (e: React.MouseEvent) => {
@@ -108,6 +124,7 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
         x,
         rotate,
         opacity,
+        scale,
         position: "absolute",
         width: "100%",
         cursor: "grab",
@@ -117,14 +134,22 @@ export const SwipeCard = ({ image, onSwipeLeft, onSwipeRight, onBuy }: SwipeCard
       onDragEnd={handleDragEnd}
       animate={exitX ? { x: exitX } : {}}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      whileTap={{ cursor: "grabbing" }}
+      whileTap={{ cursor: "grabbing", scale: 0.98 }}
+      whileHover={{ scale: 1.02 }}
+      onClick={handleDoubleTap}
     >
-      <Card className="overflow-hidden bg-gradient-card border-border shadow-card">
+      <Card className="overflow-hidden bg-gradient-card border-border shadow-card hover:shadow-glow transition-all duration-300">
         <div className="relative aspect-[3/4] bg-secondary">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+            </div>
+          )}
           <img
             src={image.image_url}
             alt={image.title}
-            className="w-full h-full object-cover"
+            onLoad={() => setImageLoaded(true)}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             draggable={false}
           />
           

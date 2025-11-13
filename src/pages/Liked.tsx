@@ -155,15 +155,25 @@ const Liked = () => {
               if (!img) return null;
               
               return (
-                <Card key={like.id} className="overflow-hidden bg-gradient-card border-border shadow-card hover-scale">
-                  <div className="aspect-[3/4] bg-secondary relative">
+                <Card key={like.id} className="overflow-hidden bg-gradient-card border-border shadow-card hover:shadow-glow hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 group">
+                  <div className="aspect-[3/4] bg-secondary relative overflow-hidden">
                     <img
                       src={img.image_url}
                       alt={img.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
                     />
-                    <div className="absolute top-2 right-2 bg-gradient-primary rounded-lg px-3 py-1 shadow-glow">
-                      <span className="text-sm font-bold">${img.price}</span>
+                    <div className="absolute top-2 right-2 z-10">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleUnlike(like.id)}
+                        className="opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-200 shadow-lg"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="absolute top-2 left-2 bg-gradient-primary rounded-lg px-3 py-1 shadow-glow transform group-hover:scale-110 transition-transform duration-200">
+                      <span className="text-sm font-bold drop-shadow-lg">${img.price}</span>
                     </div>
                   </div>
                   <div className="p-4 space-y-3">

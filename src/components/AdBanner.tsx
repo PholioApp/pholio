@@ -45,19 +45,25 @@ export const AdBanner = () => {
         .update({ clicks: ad.clicks + 1 })
         .eq("id", ad.id);
 
-      // Open link
-      window.open(ad.site_url, "_blank", "noopener,noreferrer");
+      // Ensure URL has protocol
+      let url = ad.site_url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      // Open link in new tab
+      window.open(url, "_blank", "noopener,noreferrer");
     }
   };
 
   if (!ad || dismissed) return null;
 
   return (
-    <Card className="p-4 bg-gradient-card border-primary/20 relative animate-fade-in hover:shadow-glow transition-all duration-300">
+    <Card className="p-4 bg-gradient-card border-primary/20 relative animate-fade-in hover:shadow-glow transition-all duration-300 hover:scale-[1.02] hover:border-primary/40">
       <Button
         variant="ghost"
         size="sm"
-        className="absolute top-2 right-2 h-6 w-6 p-0"
+        className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-destructive/20 hover:text-destructive transition-colors"
         onClick={() => setDismissed(true)}
       >
         <X className="h-4 w-4" />
@@ -75,7 +81,7 @@ export const AdBanner = () => {
           <img
             src={ad.image_url}
             alt={ad.title}
-            className="w-full h-32 object-cover rounded-md mb-3 group-hover:scale-105 transition-transform"
+            className="w-full h-32 object-cover rounded-md mb-3 group-hover:scale-105 transition-transform duration-300 group-hover:brightness-110"
           />
         )}
         

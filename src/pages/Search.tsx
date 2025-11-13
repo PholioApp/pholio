@@ -329,24 +329,28 @@ const Search = () => {
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {images.map((img) => (
-                    <Card key={img.id} className="overflow-hidden bg-gradient-card border-border shadow-card hover-scale">
-                      <div className="aspect-[3/4] bg-secondary relative">
+                  {images.map((img, index) => (
+                    <Card 
+                      key={img.id} 
+                      className="group overflow-hidden bg-gradient-card border-border shadow-card hover:shadow-glow hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 animate-scale-up"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <div className="aspect-[3/4] bg-secondary relative overflow-hidden">
                         <img
                           src={img.image_url}
                           alt={img.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-110 group-hover:brightness-110 transition-all duration-700"
                         />
-                        <div className="absolute top-2 right-2 bg-gradient-primary rounded-lg px-3 py-1 shadow-glow">
-                          <span className="text-sm font-bold">${img.price}</span>
+                        <div className="absolute top-2 right-2 bg-gradient-primary rounded-lg px-3 py-1 shadow-glow transform group-hover:scale-110 transition-transform duration-200">
+                          <span className="text-sm font-bold drop-shadow-lg">${img.price}</span>
                         </div>
                       </div>
                       <div className="p-4 space-y-3">
                         <div>
-                          <h3 className="font-bold text-lg mb-1">{img.title}</h3>
+                          <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{img.title}</h3>
                           <button
                             onClick={() => navigate(`/profile/${img.seller_id}`)}
-                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                            className="text-sm text-muted-foreground hover:text-primary transition-colors hover:scale-105 inline-block"
                           >
                             by @{img.seller?.username || "unknown"}
                           </button>
@@ -354,7 +358,7 @@ const Search = () => {
                         {img.tags && img.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {img.tags.slice(0, 3).map((tag: string, idx: number) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
+                              <Badge key={idx} variant="secondary" className="text-xs hover:scale-110 transition-transform cursor-pointer">
                                 {tag}
                               </Badge>
                             ))}
@@ -362,7 +366,7 @@ const Search = () => {
                         )}
                         <Button
                           onClick={() => handleBuy(img.id)}
-                          className="w-full bg-gradient-primary"
+                          className="w-full bg-gradient-primary hover:shadow-glow hover:scale-105 transition-all"
                         >
                           <ShoppingCart className="mr-2" size={16} />
                           Buy ${img.price}
