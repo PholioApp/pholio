@@ -59,6 +59,14 @@ export const FollowButton = ({
   };
 
   const handleFollow = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to follow users",
+      });
+      return;
+    }
+
     if (userId === currentUserId) {
       toast({
         variant: "destructive",
