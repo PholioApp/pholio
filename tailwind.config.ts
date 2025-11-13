@@ -52,10 +52,15 @@ export default {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-accent': 'var(--gradient-accent)',
         'gradient-card': 'var(--gradient-card)',
+        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-shine': 'var(--gradient-shine)',
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
         'card': 'var(--shadow-card)',
+        'elevated': 'var(--shadow-elevated)',
+        'button': 'var(--shadow-button)',
+        'button-hover': 'var(--shadow-button-hover)',
       },
       borderRadius: {
         lg: "var(--radius)",
