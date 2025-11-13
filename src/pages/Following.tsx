@@ -125,24 +125,24 @@ const Following = () => {
             {images.map((image, index) => (
               <Card
                 key={image.id}
-                className="overflow-hidden bg-gradient-card border-border cursor-pointer transition-all hover:scale-105 hover:shadow-glow animate-scale-up"
+                className="overflow-hidden bg-gradient-card border-border cursor-pointer transition-all hover:scale-[1.03] hover:shadow-glow hover:border-primary/40 animate-scale-up"
                 style={{ animationDelay: `${index * 0.05}s` }}
                 onClick={() => navigate(`/profile/${image.seller_id}`)}
               >
-                <div className="aspect-square bg-secondary relative group">
+                <div className="aspect-square bg-secondary relative group overflow-hidden">
                   <img
                     src={image.image_url}
                     alt={image.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:brightness-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-2 right-2 bg-gradient-primary rounded-lg px-2 py-1 shadow-glow transform group-hover:scale-110 transition-transform">
-                    <span className="text-xs font-bold text-white">${image.price}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-2 right-2 bg-gradient-primary rounded-lg px-2 py-1 shadow-glow transform group-hover:scale-110 transition-transform duration-200">
+                    <span className="text-xs font-bold text-white drop-shadow-lg">${image.price}</span>
                   </div>
                 </div>
                 <div className="p-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 rounded-full bg-secondary overflow-hidden transition-transform hover:scale-125">
+                    <div className="w-6 h-6 rounded-full bg-secondary overflow-hidden transition-transform hover:scale-125 hover:rotate-12 duration-200">
                       {image.seller.avatar_url ? (
                         <img
                           src={image.seller.avatar_url}
@@ -153,11 +153,11 @@ const Following = () => {
                         <div className="w-full h-full bg-gradient-primary" />
                       )}
                     </div>
-                    <span className="text-xs font-medium truncate">
+                    <span className="text-xs font-medium truncate hover:text-primary transition-colors">
                       @{image.seller.username}
                     </span>
                   </div>
-                  <h3 className="font-medium text-sm truncate mb-1">{image.title}</h3>
+                  <h3 className="font-medium text-sm truncate mb-1 group-hover:text-primary transition-colors">{image.title}</h3>
                   <p className="text-xs text-muted-foreground">
                     {new Date(image.created_at).toLocaleDateString()}
                   </p>
