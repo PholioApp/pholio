@@ -68,7 +68,19 @@ const Auth = () => {
   // Validate email
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmailValid(emailRegex.test(email));
+    const isValidFormat = emailRegex.test(email);
+    
+    // Check against common disposable/fake email domains
+    const disposableDomains = [
+      'tempmail.com', 'throwaway.email', '10minutemail.com', 'guerrillamail.com',
+      'mailinator.com', 'trashmail.com', 'yopmail.com', 'temp-mail.org',
+      'fakeinbox.com', 'maildrop.cc', 'getnada.com', 'example.com', 'test.com'
+    ];
+    
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    const isDisposable = disposableDomains.includes(emailDomain);
+    
+    setEmailValid(isValidFormat && !isDisposable);
   }, [email]);
 
   // Calculate form progress
@@ -309,6 +321,17 @@ const Auth = () => {
         });
         navigate("/");
       } else {
+        // Validate email before signup
+        if (!emailValid) {
+          toast({
+            variant: "destructive",
+            title: "Invalid Email",
+            description: "Please use a valid email address. Disposable/temporary email addresses are not allowed.",
+          });
+          setLoading(false);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -341,10 +364,18 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-secondary/20 relative overflow-hidden">
-      {/* Animated background elements */}
+      {/* Christmas decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        {/* Snowflakes in corners */}
+        <div className="absolute top-4 left-4 text-6xl opacity-20 animate-float">❄️</div>
+        <div className="absolute top-4 right-4 text-6xl opacity-20 animate-float" style={{ animationDelay: '1s' }}>❄️</div>
+        <div className="absolute bottom-4 left-4 text-6xl opacity-20 animate-float" style={{ animationDelay: '2s' }}>🎄</div>
+        <div className="absolute bottom-4 right-4 text-6xl opacity-20 animate-float" style={{ animationDelay: '3s' }}>🎁</div>
+        
+        {/* Animated background elements with Christmas colors */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 right-1/3 w-80 h-80 bg-red-500/3 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <div className="w-full max-w-md relative z-10">

@@ -282,6 +282,12 @@ const Index = () => {
       <ParallaxBackground />
       <AchievementNotification achievement={currentAchievement} onClose={clearAchievement} />
       
+      {/* Christmas decorations */}
+      <div className="absolute top-10 left-4 text-4xl opacity-30 animate-float pointer-events-none z-10">🎄</div>
+      <div className="absolute top-20 right-8 text-3xl opacity-30 animate-float pointer-events-none z-10" style={{ animationDelay: '1s' }}>⭐</div>
+      <div className="absolute top-40 left-1/3 text-2xl opacity-20 animate-float pointer-events-none z-10" style={{ animationDelay: '2s' }}>🎁</div>
+      <div className="absolute top-60 right-1/4 text-3xl opacity-25 animate-float pointer-events-none z-10" style={{ animationDelay: '1.5s' }}>🔔</div>
+      
       {/* Ad Banner */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-20">
         <AdBanner />
