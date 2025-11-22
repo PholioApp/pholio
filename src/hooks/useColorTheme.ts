@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 const COLOR_THEMES = [
+  { name: "Christmas Magic", primary: "355 85% 55%", accent: "140 75% 45%", premium: false, className: "animate-christmas-sparkle" },
   { name: "Purple Dream", primary: "270 91% 65%", accent: "280 89% 60%", premium: false, className: "" },
   { name: "Ocean Blue", primary: "210 100% 50%", accent: "200 98% 60%", premium: false, className: "" },
   { name: "Sunset Orange", primary: "25 95% 55%", accent: "15 90% 60%", premium: false, className: "" },
@@ -27,7 +28,7 @@ export const useColorTheme = () => {
         
         // Apply special classes for premium themes
         const body = document.body;
-        body.classList.remove('glass-premium', 'animate-glass-shimmer', 'neon-effect', 'animate-neon-pulse', 'animate-glow', 'animate-shimmer');
+        body.classList.remove('glass-premium', 'animate-glass-shimmer', 'neon-effect', 'animate-neon-pulse', 'animate-glow', 'animate-shimmer', 'animate-christmas-sparkle');
         
         if (theme.className) {
           const classes = theme.className.split(' ');

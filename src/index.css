@@ -199,6 +199,33 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes christmas-sparkle {
+    0%, 100% { 
+      box-shadow: 
+        0 0 20px hsl(355 85% 55% / 0.6), 
+        0 0 40px hsl(140 75% 45% / 0.4),
+        0 0 60px hsl(355 85% 55% / 0.3);
+    }
+    25% { 
+      box-shadow: 
+        0 0 30px hsl(355 85% 55% / 0.8), 
+        0 0 50px hsl(140 75% 45% / 0.5),
+        0 0 70px hsl(355 85% 55% / 0.4);
+    }
+    50% { 
+      box-shadow: 
+        0 0 40px hsl(140 75% 45% / 0.8), 
+        0 0 60px hsl(355 85% 55% / 0.5),
+        0 0 80px hsl(140 75% 45% / 0.4);
+    }
+    75% { 
+      box-shadow: 
+        0 0 30px hsl(355 85% 55% / 0.8), 
+        0 0 50px hsl(140 75% 45% / 0.5),
+        0 0 70px hsl(355 85% 55% / 0.4);
+    }
+  }
+
   .animate-float {
     animation: float 10s ease-in-out infinite;
   }
@@ -269,6 +296,10 @@ All colors MUST be HSL.
 
   .animate-glass-shimmer {
     animation: glass-shimmer 3s linear infinite;
+  }
+
+  .animate-christmas-sparkle {
+    animation: christmas-sparkle 3s ease-in-out infinite;
   }
 
   .hover-scale:hover {
