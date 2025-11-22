@@ -226,6 +226,15 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes snow-fall {
+    0% {
+      transform: translateY(-10vh) translateX(0);
+    }
+    100% {
+      transform: translateY(110vh) translateX(100px);
+    }
+  }
+
   .animate-float {
     animation: float 10s ease-in-out infinite;
   }
@@ -300,6 +309,10 @@ All colors MUST be HSL.
 
   .animate-christmas-sparkle {
     animation: christmas-sparkle 3s ease-in-out infinite;
+  }
+
+  .animate-snow-fall {
+    animation: snow-fall linear infinite;
   }
 
   .hover-scale:hover {
