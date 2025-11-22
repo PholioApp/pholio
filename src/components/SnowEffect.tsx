@@ -12,13 +12,13 @@ export const SnowEffect = () => {
   const [snowflakes, setSnowflakes] = useState<Snowflake[]>([]);
 
   useEffect(() => {
-    // Create 50 snowflakes with random properties
-    const flakes = Array.from({ length: 50 }, (_, i) => ({
+    // Create 15 snowflakes with random properties (lighter snowfall)
+    const flakes = Array.from({ length: 15 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
-      animationDuration: 5 + Math.random() * 10,
-      fontSize: 10 + Math.random() * 20,
-      opacity: 0.3 + Math.random() * 0.7,
+      animationDuration: 8 + Math.random() * 12,
+      fontSize: 12 + Math.random() * 16,
+      opacity: 0.2 + Math.random() * 0.4,
     }));
     setSnowflakes(flakes);
   }, []);

@@ -48,6 +48,7 @@ All colors MUST be HSL.
     --gradient-aurora: linear-gradient(135deg, hsl(160 90% 50%), hsl(280 90% 60%));
     --gradient-hero: linear-gradient(135deg, hsl(262 83% 58%), hsl(282 83% 68%), hsl(302 83% 58%));
     --gradient-shine: linear-gradient(45deg, transparent 30%, hsla(0 0% 100% / 0.3) 50%, transparent 70%);
+    --gradient-christmas: linear-gradient(135deg, hsl(355 75% 45%), hsl(25 90% 55%), hsl(140 60% 40%));
     
     --shadow-glow: 0 0 40px hsl(262 83% 58% / 0.4);
     --shadow-card: 0 8px 32px hsl(240 10% 3.9% / 0.12);
@@ -59,6 +60,16 @@ All colors MUST be HSL.
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  body {
+    background: linear-gradient(135deg, 
+      hsl(355 70% 25%) 0%,
+      hsl(25 80% 35%) 30%,
+      hsl(140 50% 25%) 60%,
+      hsl(355 70% 20%) 100%
+    );
+    background-attachment: fixed;
   }
 
   .dark {
@@ -93,6 +104,16 @@ All colors MUST be HSL.
     /* Custom design tokens for dark mode */
     --gradient-card: linear-gradient(180deg, hsl(240 10% 9%), hsl(240 10% 7%));
     --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+  }
+  
+  .dark body {
+    background: linear-gradient(135deg, 
+      hsl(355 60% 15%) 0%,
+      hsl(25 70% 20%) 30%,
+      hsl(140 40% 15%) 60%,
+      hsl(355 60% 12%) 100%
+    );
+    background-attachment: fixed;
   }
 
   @keyframes float {
