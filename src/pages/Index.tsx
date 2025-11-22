@@ -413,35 +413,32 @@ const Index = () => {
 
       {/* Bottom Navigation Bar - Compact */}
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl z-50 animate-slide-up">
-        <div className="max-w-7xl mx-auto px-2 py-2">
-          <div className="flex items-center justify-around">
+        <div className="max-w-7xl mx-auto px-2 py-3">
+          <div className="flex items-center justify-around gap-1">
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 navigate("/trending");
               }}
-              className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Trending"
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <TrendingUp size={22} className="transition-transform duration-300 hover:rotate-12" />
+              <TrendingUp size={20} className="transition-transform duration-300 hover:rotate-12" />
+              <span className="text-[10px] font-medium">Trending</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 navigate("/challenges");
               }}
-              className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Challenges"
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <Trophy size={22} className="transition-transform duration-300 hover:rotate-12" />
+              <Trophy size={20} className="transition-transform duration-300 hover:rotate-12" />
+              <span className="text-[10px] font-medium">Challenges</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 if (!user) {
@@ -458,14 +455,13 @@ const Index = () => {
                 }
                 navigate("/following");
               }}
-              className="h-12 w-12 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Following"
+              className="flex-col h-auto py-2 px-3 hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <UserPlus size={22} className="transition-transform duration-300 hover:rotate-12" />
+              <UserPlus size={20} className="transition-transform duration-300 hover:rotate-12" />
+              <span className="text-[10px] font-medium">Following</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 if (!user) {
@@ -482,14 +478,13 @@ const Index = () => {
                 }
                 navigate("/liked");
               }}
-              className="h-12 w-12 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Favorites"
+              className="flex-col h-auto py-2 px-3 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <Heart size={22} className="transition-transform duration-300 hover:scale-125" />
+              <Heart size={20} className="transition-transform duration-300 hover:scale-125" />
+              <span className="text-[10px] font-medium">Favorites</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 if (!user) {
@@ -506,14 +501,13 @@ const Index = () => {
                 }
                 navigate("/upload");
               }}
-              className="h-12 w-12 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Upload"
+              className="flex-col h-auto py-2 px-3 hover:bg-accent/20 hover:text-accent transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <Upload size={22} className="transition-transform duration-300 hover:-translate-y-1" />
+              <Upload size={20} className="transition-transform duration-300 hover:-translate-y-1" />
+              <span className="text-[10px] font-medium">Upload</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 if (!user) {
@@ -530,26 +524,24 @@ const Index = () => {
                 }
                 navigate("/purchases");
               }}
-              className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Purchases"
+              className="flex-col h-auto py-2 px-3 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <ShoppingBag size={22} className="transition-transform duration-300 hover:rotate-12" />
+              <ShoppingBag size={20} className="transition-transform duration-300 hover:rotate-12" />
+              <span className="text-[10px] font-medium">Purchases</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 navigate("/leaderboard");
               }}
-              className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Leaders"
+              className="flex-col h-auto py-2 px-3 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <Users size={22} className="transition-transform duration-300 hover:scale-110" />
+              <Users size={20} className="transition-transform duration-300 hover:scale-110" />
+              <span className="text-[10px] font-medium">Leaders</span>
             </Button>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => {
                 soundManager.play('click');
                 if (!user) {
@@ -566,10 +558,10 @@ const Index = () => {
                 }
                 navigate("/profile");
               }}
-              className="h-12 w-12 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-glow rounded-xl"
-              title="Profile"
+              className="flex-col h-auto py-2 px-3 hover:bg-secondary/20 hover:text-secondary transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-glow rounded-xl gap-1"
             >
-              <User size={22} className="transition-transform duration-300 hover:rotate-12" />
+              <User size={20} className="transition-transform duration-300 hover:rotate-12" />
+              <span className="text-[10px] font-medium">Profile</span>
             </Button>
             <SettingsDialog />
           </div>
