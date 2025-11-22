@@ -18,6 +18,7 @@ import { usePremiumStatus } from "@/hooks/usePremiumStatus";
 import { Badge } from "@/components/ui/badge";
 
 const COLOR_THEMES = [
+  { name: "Christmas Magic", primary: "355 85% 55%", accent: "140 75% 45%", icon: "🎄", premium: false, className: "animate-christmas-sparkle" },
   { name: "Purple Dream", primary: "270 91% 65%", accent: "280 89% 60%", icon: "💜", premium: false, className: "" },
   { name: "Ocean Blue", primary: "210 100% 50%", accent: "200 98% 60%", icon: "🌊", premium: false, className: "" },
   { name: "Sunset Orange", primary: "25 95% 55%", accent: "15 90% 60%", icon: "🌅", premium: false, className: "" },
@@ -68,7 +69,7 @@ export const SettingsDialog = ({ triggerButton }: { triggerButton?: React.ReactN
     // Apply special classes for premium themes
     const body = document.body;
     // Remove all theme classes first
-    body.classList.remove('glass-premium', 'animate-glass-shimmer', 'neon-effect', 'animate-neon-pulse', 'animate-glow', 'animate-shimmer');
+    body.classList.remove('glass-premium', 'animate-glass-shimmer', 'neon-effect', 'animate-neon-pulse', 'animate-glow', 'animate-shimmer', 'animate-christmas-sparkle');
     
     // Add the theme's special classes if it has any
     if (selectedTheme.className) {
